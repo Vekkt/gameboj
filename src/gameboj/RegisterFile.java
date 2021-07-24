@@ -12,7 +12,7 @@ import java.util.Arrays;
  * @author Gaietan RENAULT 283350
  */
 public final class RegisterFile<E extends Register> {
-	private byte[] file;
+	private final byte[] file;
 
 	/**
 	 * Creates a register file of specified registers

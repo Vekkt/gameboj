@@ -7,7 +7,7 @@ package gameboj.bits;
  * @author Gaietan RENAULT 283350
  */
 public interface Bit {
-	abstract int ordinal();
+	int ordinal();
 
 	/**
 	 * Returns the index of the bit

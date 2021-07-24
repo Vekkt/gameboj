@@ -19,7 +19,7 @@ public final class Wave extends SoundChannel {
     private int wavePosition;
     private int freqDiv;
 
-    public Wave() {
+    Wave() {
         super(ChannelType.WAVE);
         waveRAM = new Ram(REG_WAVE_TAB_SIZE);
         sinceLastRead = 65_536;

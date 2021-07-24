@@ -86,7 +86,7 @@ public final class Bits {
 		if (0 > index || index >= 32) {
 			throw new IndexOutOfBoundsException();
 		}
-		return bits ^= (-(newValue ? 1 : 0) ^ bits) & mask(index);
+		return bits ^ (-(newValue ? 1 : 0) ^ bits) & mask(index);
 	}
 
 	/**
@@ -141,7 +141,7 @@ public final class Bits {
 	public static int signExtend8(int b) {
 		Preconditions.checkBits8(b);
 		byte y = (byte) b;
-		return (int) y;
+		return y;
 	}
 
 	/**

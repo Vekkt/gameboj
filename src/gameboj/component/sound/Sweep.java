@@ -18,7 +18,7 @@ public final class Sweep extends Square {
     private int timer;
     private int shift;
 
-    public Sweep() {
+    Sweep() {
         super(ChannelType.SQUARE_A);
     }
 
@@ -57,12 +57,12 @@ public final class Sweep extends Square {
         return reallyClock();
     }
 
-    public void startSweep() {
+    private void startSweep() {
         counterEnabled = false;
         counter = 8192;
     }
 
-    public void clockSweep() {
+    private void clockSweep() {
         if (++counter == DIVIDER) {
             counter = 0;
             if (counterEnabled && --timer == 0) {
@@ -80,7 +80,7 @@ public final class Sweep extends Square {
         }
     }
 
-    public void triggerSweep() {
+    private void triggerSweep() {
         isIncrementing = false;
         overflow = false;
 

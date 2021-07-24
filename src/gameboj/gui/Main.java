@@ -40,8 +40,6 @@ public class Main extends Application {
 		if (getParameters().getRaw().size() > 1)
 			System.exit(1);
 
-
-
 		File romFile = new File(getParameters().getRaw().get(0));
 		Cartridge rom = Cartridge.ofFile(romFile);
 		GameBoy gb = new GameBoy(rom);

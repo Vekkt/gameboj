@@ -4,8 +4,6 @@ import gameboj.component.lcd.LcdImage;
 import javafx.embed.swing.SwingFXUtils;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.util.Arrays;
 
 public class ImageConverter {
 	private static final int[] COLOR_MAP = new int[] {

@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public final class Rom {
 
-	private byte[] data;
+	private final byte[] data;
 
 	/**
 	 * Constructor of Rom, copies the ArrayList "data"

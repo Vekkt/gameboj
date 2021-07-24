@@ -11,18 +11,18 @@ public class Square extends SoundChannel{
             0b01111110,
     };
 
-    protected final VolumeEnvelope envelope;
+    final VolumeEnvelope envelope;
 
-    protected int wavePosition;
-    protected int freqDiv;
-    protected int duty;
+    private int wavePosition;
+    private int freqDiv;
+    private int duty;
 
-    public Square(ChannelType type) {
+    Square(ChannelType type) {
         super(type);
         envelope = new VolumeEnvelope();
     }
 
-    public Square() {
+    Square() {
         this(ChannelType.SQUARE_B);
     }
 
@@ -50,7 +50,7 @@ public class Square extends SoundChannel{
         return reallyClock();
     }
 
-    protected int reallyClock() {
+    int reallyClock() {
         if (!(updateLength() && dacEnabled)) return 0;
 
         if (--freqDiv == 0) {
@@ -77,7 +77,7 @@ public class Square extends SoundChannel{
 
     private int dutyPattern() { return regFile.get(Reg.NR1) >> 6; }
 
-    protected int getFrequency() {
+    int getFrequency() {
         int lsb = regFile.get(Reg.NR3);
         int msb = clip(3, regFile.get(Reg.NR4));
         return make16(msb, lsb);

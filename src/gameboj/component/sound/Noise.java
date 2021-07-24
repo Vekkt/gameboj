@@ -13,7 +13,7 @@ public final class Noise extends SoundChannel {
     private int frequencyTimer;
     private int frequencyDivisor;
 
-    public Noise() {
+    Noise() {
         super(ChannelType.NOISE);
         envelope = new VolumeEnvelope();
         lfsr = LFSR_INITIAL;

@@ -19,9 +19,9 @@ public final class VolumeEnvelope {
     private int counter;
     private boolean stopped;
 
-    public boolean isEnabled() { return period > 0; }
+    private boolean isEnabled() { return period > 0; }
 
-    public void updateEnvelope(int data) {
+    void updateEnvelope(int data) {
         this.initialVolume = data >> 4;
         this.envelopeDirection = test(data, 3) ? Direction.INCR : Direction.DECR;
         this.period = data & 0x07;
@@ -32,13 +32,13 @@ public final class VolumeEnvelope {
         counter = 8192;
     }
 
-    public void trigger() {
+    void trigger() {
         volume = initialVolume;
         counter = 0;
         stopped = false;
     }
 
-    public void clock() {
+    void clock() {
         if (stopped) return;
         if ((volume == MIN_VOLUME && envelopeDirection == Direction.DECR)
             || (volume == MAX_VOLUME && envelopeDirection == Direction.INCR)) {
@@ -51,7 +51,7 @@ public final class VolumeEnvelope {
         }
     }
 
-    public int getVolume() {
+    int getVolume() {
         if (isEnabled()) return volume;
         else return initialVolume;
     }

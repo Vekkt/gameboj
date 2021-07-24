@@ -64,7 +64,7 @@ public final class Ram {
 	}
 
 	public void saveRam(File file) {
-		OutputStream out = null;
+		OutputStream out;
 		try {
 			file.getParentFile().mkdirs();
 			file.createNewFile();

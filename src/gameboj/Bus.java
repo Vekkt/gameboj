@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public final class Bus {
 
-	private ArrayList<Component> comp = new ArrayList<>();
+	private final ArrayList<Component> comp = new ArrayList<>();
 
 	/**
 	 * Add a component to the bus

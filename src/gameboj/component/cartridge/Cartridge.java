@@ -35,15 +35,12 @@ public final class Cartridge implements Component {
 	 * @throws IllegalArgumentException if the ROM is not of type 0
 	 */
 	public static Cartridge ofFile(File romFile) throws IOException {
-		InputStream stream = new FileInputStream(romFile);
-		cartridgeName = romFile.getName();
 
-		try {
-			byte[] data = Files.readAllBytes(romFile.toPath());
-			return new Cartridge(new MBC1(new Rom(data), RAM_SIZE[data[0x149]], cartridgeName));
-		} finally {
-			stream.close();
-		}
+        try (InputStream stream = new FileInputStream(romFile)) {
+            cartridgeName = romFile.getName();
+            byte[] data = Files.readAllBytes(romFile.toPath());
+            return new Cartridge(new MBC1(new Rom(data), RAM_SIZE[data[0x149]], cartridgeName));
+        }
 	}
 
 	public String getName() {

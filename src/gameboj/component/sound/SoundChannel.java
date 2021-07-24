@@ -20,17 +20,17 @@ public abstract class SoundChannel implements Component {
         NR0, NR1, NR2, NR3, NR4
     }
 
-    protected final RegisterFile<Reg> regFile = new RegisterFile<>(Reg.values());
+    final RegisterFile<Reg> regFile = new RegisterFile<>(Reg.values());
 
-    protected final int regStartAddress;
-    protected final int regEndAddress;
-    protected final int[] channelMasks;
+    final int regStartAddress;
+    final int regEndAddress;
+    private final int[] channelMasks;
 
-    protected final LengthCounter length;
-    protected boolean dacEnabled;
-    protected boolean channelEnabled;
+    final LengthCounter length;
+    boolean dacEnabled;
+    boolean channelEnabled;
 
-    public SoundChannel(ChannelType type) {
+    SoundChannel(ChannelType type) {
         regStartAddress = REGS_CH_START[type.ordinal()];
         regEndAddress = REGS_CH_END[type.ordinal()];
         channelMasks = CHANNEL_MASKS[type.ordinal()];
@@ -51,10 +51,6 @@ public abstract class SoundChannel implements Component {
 
     // End Abstract Methods
     /**************************************************************************/
-
-    public boolean isEnabled() {
-        return channelEnabled && dacEnabled;
-    }
 
     @Override
     public int read(int address) {
@@ -80,7 +76,7 @@ public abstract class SoundChannel implements Component {
         }
     }
 
-    protected boolean updateLength() {
+    boolean updateLength() {
         length.clock();
         if (!length.isEnabled()) {
             return channelEnabled;
@@ -91,13 +87,17 @@ public abstract class SoundChannel implements Component {
         return channelEnabled;
     }
 
-    protected int frequency() {
+    int frequency() {
         int lsb = regFile.get(Reg.NR3);
         int msb = clip(3, regFile.get(Reg.NR4));
         return 2048 - make16(msb, lsb);
     }
 
-    protected void stop() {
+    void stop() {
         channelEnabled = false;
+    }
+
+    boolean isEnabled() {
+        return channelEnabled && dacEnabled;
     }
 }
