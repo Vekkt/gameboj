@@ -15,9 +15,8 @@ import java.util.Objects;
 
 /**
  * Represents the GameBoy system, with all its components attached
- * 
- * @author Francois BURGUET 288683
- * @author Gaietan Renault 283350
+ *
+ * @author Francois BURGUET
  */
 
 public final class GameBoy {
@@ -37,7 +36,7 @@ public final class GameBoy {
 
 	/**
 	 * Initialize the GameBoy and all its components
-	 * 
+	 *
 	 * @param cartridge : a virtual game cartridge, non-null
 	 * @throws NullPointerException if cartridge is null
 	 */
@@ -117,9 +116,9 @@ public final class GameBoy {
 	/**
 	 * Runs the GB until the specified clock tick.
 	 * Instructions for CPU, LCD controller and timer
-	 * take 4 clock ticks to execute.
+	 * always take 4 clock ticks to execute.
 	 * @param tick : clock tick until which the simulation is executed
-	 * @throws IllegalArgumentException if invalid cycle
+	 * @throws IllegalArgumentException if invalid tick value
 	 */
 	public void runUntil(long tick) {
 		Preconditions.checkArgument(0 <= tick && this.tick <= tick);
