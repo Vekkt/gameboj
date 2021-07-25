@@ -2,11 +2,11 @@ package gameboj.bits;
 
 import gameboj.Preconditions;
 
+import java.util.Objects;
+
 /**
- * Utilitarian methods for bits manipulation
- * 
- * @author Francois BURGUET 288683
- * @author Gaietan Renault 283350
+ * Methods for bits manipulation.
+ * @author Francois BURGUET
  */
 
 public final class Bits {
@@ -33,11 +33,12 @@ public final class Bits {
 	}
 
 	/**
-	 * Returns a binary number with only zeros, except a one at index
-	 * 
+	 * Returns a binary number with only zeros, except a one at the
+	 * position given by <code>index</code>.
+	 *
 	 * @param index : where the one bit has to be in the mask
 	 * @return mask : the mask corresponding to the index
-	 * @throws IndexOutOfBoundsException if index is not between 0 and 32
+	 * @throws IndexOutOfBoundsException if index is not between 0 and 31 (included)
 	 */
 	public static int mask(int index) {
 		if (0 > index || index >= 32) {
@@ -47,12 +48,13 @@ public final class Bits {
 	}
 
 	/**
-	 * Tests if the value at index is a one or a zero in the binary representation
-	 * 
+	 * Tests if the value at the specified <code>index</code> is a one
+	 * in the binary representation of <code>bits</code>.
+	 *
 	 * @param bits : bits to test
 	 * @param index : index of the bit to test in bits
 	 * @return true if the bit at index is one, else false
-	 * @throws IndexOutOfBoundsException if index is not between 0 and 31 (both included)
+	 * @throws IndexOutOfBoundsException if <code>index</code> is not between 0 and 31 (included)
 	 */
 	public static boolean test(int bits, int index) {
 		if (0 > index || index >= 32) {
@@ -62,25 +64,27 @@ public final class Bits {
 	}
 
 	/**
-	 * Tests if the value at index, given by bit, in bits is a one or a zero.
-	 * 
-	 * @param bits : bits to test
-	 * @param bit : bit to test in bits
-	 * @return true if the bit in bits is one, else false
-	 * @throws IndexOutOfBoundsException if index is not between 0 and 31 (both included)
+	 * Tests if the bit at the specified <code>index</code> is a one or a
+	 * zero in the bit representation of the <code>value</code> parameter.
+	 *
+	 * @param bits : bits value on which to perform the test
+	 * @param bit : bit index to test in bits
+	 * @return true if the corresponding bit in the value is a one, else false
+	 * @throws IndexOutOfBoundsException if the index is not between 0 and 31 (included)
 	 */
 	public static boolean test(int bits, Bit bit) {
 		return (bits & bit.mask()) != 0;
 	}
 
 	/**
-	 * Sets the value at index in bits at newValue.
-	 * 
-	 * @param bits : bits to modify
+	 * Sets the value in <code>bits</code> at the specified <code>index</code>
+	 * to the value given by <code>newValue</code>.
+	 *
+	 * @param bits : value to modify
 	 * @param index : index of the bit to change
-	 * @param newValue : new value of the bit at the index in bits
-	 * @return the new bit containing newValue at index bit
-	 * @throws IndexOutOfBoundsException if index is not between 0 and 31 (both included)
+	 * @param newValue : new value of the bit at the index
+	 * @return the new value containing the modified bit
+	 * @throws IndexOutOfBoundsException if index is not between 0 and 31 (included)
 	 */
 	public static int set(int bits, int index, boolean newValue) {
 		if (0 > index || index >= 32) {
@@ -90,12 +94,12 @@ public final class Bits {
 	}
 
 	/**
-	 * Selects the first size bits from bits
-	 * 
+	 * Selects the first <code>size</code> bits from the value in <code>bits</code>.
+	 *
 	 * @param size : size of the clip
 	 * @param bits : bits to clip on
 	 * @return the clipped part of bits
-	 * @throws IllegalArgumentException if the size is not between 0 and 32 (both included)
+	 * @throws IllegalArgumentException if the size is not between 0 and 31 (included)
 	 */
 	public static int clip(int size, int bits) {
 		Preconditions.checkArgument(0 <= size && size <= 32);
@@ -103,27 +107,32 @@ public final class Bits {
 	}
 
 	/**
-	 * Extracts the part of bits between start and start+size
-	 * 
-	 * @param bits : bits to extract from
-	 * @param start : where to start the extraction
-	 * @param size : size of the extraction
-	 * @return the extracted part of bits between start and start+size
+	 * Extracts a portion in the bit representation of <code>bits</code>
+	 * from position <code>start</code> of length <code>size</code>.
+	 *
+	 * @param bits : value from which to extract
+	 * @param start : index at which to start the extraction
+	 * @param size : size of the extracted part
+	 * @return the extracted part of the value of the given size
 	 * @throws IndexOutOfBoundsException if the parameters are in conflict
 	 */
 	public static int extract(int bits, int start, int size) {
-//		Objects.checkFromIndexSize(start, size, Integer.SIZE);
+		Preconditions.checkArgument(0 <= start && 0 <= size);
+		Preconditions.checkArgument(0 <= start+size && start+size < 32);
 		return Bits.clip(size, bits >> start);
 	}
 
 	/**
-	 * Rotates the size bits value bits of distance in a certain direction
-	 * 
-	 * @param size : size of the extraction
-	 * @param bits : bits to rotate
-	 * @param distance : rotation to the left if positive, else to the right
+	 * Rotates the bit representation of the value <code>bits</code> by a
+	 * given <code>distance</code>, then returns the clipped value of the
+	 * specified <code>size</code>. A negative distance means the direction
+	 * is to the left (right otherwise).
+	 *
+	 * @param size : size of the clipped value
+	 * @param bits : value to rotate
+	 * @param distance : distance of the rotation
 	 * @return the rotated bits
-	 * @throws IllegalArgumentException if the size is not between 0 and 32 (both included)
+	 * @throws IllegalArgumentException if the size is not between 0 and 31 (included)
 	 */
 	public static int rotate(int size, int bits, int distance) {
 		Preconditions.checkArgument(0 < size && size <= 32);
@@ -132,21 +141,21 @@ public final class Bits {
 	}
 
 	/**
-	 * Extends the sign of b
-	 * 
+	 * Extends the sign of b by casting it to <code>byte</code>.
+	 * The <code>int</code> value is supposed to be an 8-bit value.
+	 *
 	 * @param b : bits to extend sign of
 	 * @return extended sign value of the parameter
 	 * @throws IllegalArgumentException if b is not an 8 bit value
 	 */
 	public static int signExtend8(int b) {
 		Preconditions.checkBits8(b);
-		byte y = (byte) b;
-		return y;
+		return (byte) b;
 	}
 
 	/**
-	 * Exchange the bits of b symmetrically
-	 * 
+	 * Exchange the bits of b symmetrically using a look-up table.
+	 *
 	 * @param b : bits to reverse
 	 * @return the reversed value of the parameter
 	 * @throws IllegalArgumentException if b is not a 8 bit value
@@ -157,8 +166,8 @@ public final class Bits {
 	}
 
 	/**
-	 * Inverts all bits of b
-	 * 
+	 * Inverts all bits of b.
+	 *
 	 * @param b : bits to inverse
 	 * @return the complement of the parameter
 	 * @throws IllegalArgumentException if b is not an 8 bit value
@@ -169,9 +178,10 @@ public final class Bits {
 	}
 
 	/**
-	 * Creates a new 16 bit value. the 8 MSB taken from first argument and the 8 LSB
-	 * from second argument
-	 * 
+	 * Creates a new 16 bit value. The 8 most-significant-bits are
+	 * taken from the first argument and the 8 least-significant-bits are
+	 * from the second argument.
+	 *
 	 * @param highB : 8 bit value, MSB of the new value
 	 * @param lowB : 8 bit value, LSB of the new value
 	 * @return the 16 bit value created from highB and lowB
