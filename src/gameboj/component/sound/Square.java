@@ -47,12 +47,12 @@ public class Square extends SoundChannel{
     @Override
     public int clock() {
         envelope.clock();
+        if (!(updateLength() && dacEnabled))
+            return 0;
         return reallyClock();
     }
 
     int reallyClock() {
-        if (!(updateLength() && dacEnabled)) return 0;
-
         if (--freqDiv == 0) {
             freqDiv = frequency() * 4;
             duty = test(DUTY_PATTERN[dutyPattern()], wavePosition) ? 1 : 0;

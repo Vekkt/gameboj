@@ -52,8 +52,7 @@ public abstract class SoundChannel implements Component {
     // End Abstract Methods
     /**************************************************************************/
 
-    @Override
-    public int read(int address) {
+    @Override public int read(int address) {
         if (regStartAddress <= address && address < regEndAddress) {
             int idx = address - regStartAddress;
             return regFile.get(Reg.values()[idx]) | channelMasks[idx];
@@ -61,13 +60,12 @@ public abstract class SoundChannel implements Component {
         return NO_DATA;
     }
 
-    @Override
-    public void write(int address, int data) {
+    @Override public void write(int address, int data) {
         if (regStartAddress <= address && address < regEndAddress) {
             Reg reg = Reg.values()[address - regStartAddress];
             regFile.set(reg, data);
             if (reg == Reg.NR4) {
-                length.updateLength(data);
+                length.trigger(data);
                 if (test(data, 7)) {
                     channelEnabled = dacEnabled;
                     trigger();

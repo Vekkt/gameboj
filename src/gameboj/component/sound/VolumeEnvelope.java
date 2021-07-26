@@ -29,7 +29,7 @@ public final class VolumeEnvelope {
 
     public void start() {
         stopped = true;
-        counter = 8192;
+        counter = DIVIDER / 8;
     }
 
     void trigger() {

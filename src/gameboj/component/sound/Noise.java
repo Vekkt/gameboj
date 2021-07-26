@@ -23,7 +23,7 @@ public final class Noise extends SoundChannel {
     public int clock() {
         envelope.clock();
 
-        if (!updateLength() || !dacEnabled) return 0;
+        if (!(updateLength() && dacEnabled)) return 0;
         if (--frequencyTimer == 0) {
             frequencyTimer = frequencyDivisor;
             lastLFSR = updateLFSR();

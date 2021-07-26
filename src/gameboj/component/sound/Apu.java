@@ -46,7 +46,7 @@ public final class Apu implements Component, Clocked {
     }
 
     @Override
-    public void cycle(long cycle) { // need to be optimized
+    public void cycle(long cycle) {
         if (!enabled) return;
         for (int i = 0; i < channels.length; ++i)
             amplitudes[i] = channels[i].clock();
@@ -66,16 +66,16 @@ public final class Apu implements Component, Clocked {
         left *= extract(volumes, 4, 3);
         right *= clip(3, volumes);
 
+        /* Needs to be optimized */
 //        output.play((byte) left, (byte) right);
     }
 
-    @Override
-    public int read(int address) {
-        if (0xFF27 <= address && address <= 0xFF2F) {
+    @Override public int read(int address) {
+        if (REG_STATUS < address && address < REG_WAVE_TAB_START) {
             return 0xFF;
         }
         if (REGS_CH1_START <= address && address < REGS_CH4_END) {
-            return channels[(address - REGS_CH1_START) / 5].read(address); // WARNING : CHECK THAT
+            return channels[(address - REGS_CH1_START) / 5].read(address);
         } else switch (address) {
             case REG_VIN_CONTROL:
                 return regFile.get(Reg.NR50) | MASKS[Reg.NR50.ordinal()];
@@ -94,10 +94,9 @@ public final class Apu implements Component, Clocked {
         return NO_DATA;
     }
 
-    @Override
-    public void write(int address, int data) {
+    @Override public void write(int address, int data) {
         if (REGS_CH1_START <= address && address < REGS_CH4_END) {
-            channels[(address - REGS_CH1_START) / 5].write(address, data); // WARNING : CHECK THAT
+            channels[(address - REGS_CH1_START) / 5].write(address, data);
         } else if (REG_WAVE_TAB_START <= address && address < REG_WAVE_TAB_END) {
             channels[2].write(address, data);
         } else switch (address) {
@@ -131,17 +130,17 @@ public final class Apu implements Component, Clocked {
     }
 
     private void start() {
-        for (int addr = REGS_CH1_START; addr <= REG_OUTPUT_CONTROL; ++addr) {
-            if (addr == REG_CH1_LENGTH || addr == REG_CH2_LENGTH || addr == REG_CH4_LENGTH)
-                write(addr, clip(6, read(addr)));
-            else if (addr == REG_CH3_LENGTH)
-                write(addr, read(addr));
+        for (int address = REGS_CH1_START; address <= REG_OUTPUT_CONTROL; ++address) {
+            if (address == REG_CH1_LENGTH || address == REG_CH2_LENGTH || address == REG_CH4_LENGTH)
+                write(address, clip(6, read(address)));
+            else if (address == REG_CH3_LENGTH)
+                write(address, read(address));
             else
-                write(addr, 0x00);
+                write(address, 0x00);
         }
 
         for (SoundChannel c : channels)
-            c.start(); // WARNING : CHECK THAT
+            c.start();
         output.start();
     }
 }

@@ -79,7 +79,7 @@ public final class Wave extends SoundChannel {
     @Override
     public int clock() {
         sinceLastRead++;
-        if (!updateLength() || !dacEnabled) return 0;
+        if (!(updateLength() && dacEnabled)) return 0;
         if (!test(regFile.get(Reg.NR0), 7)) return 0;
 
         if (--freqDiv == 0) {
