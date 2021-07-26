@@ -51,22 +51,22 @@ public final class Apu implements Component, Clocked {
         for (int i = 0; i < channels.length; ++i)
             amplitudes[i] = channels[i].clock();
 
-        int outputSelect = regFile.get(Reg.NR51);
-        int left = 0;
-        int right = 0;
-
-        for (int i = 0; i < channels.length; i++) {
-            if (test(outputSelect, i + 4)) left += amplitudes[i];
-            if (test(outputSelect, i)) right += amplitudes[i];
-        }
-        left /= 4;
-        right /= 4;
-
-        int volumes = regFile.get(Reg.NR50);
-        left *= extract(volumes, 4, 3);
-        right *= clip(3, volumes);
-
         /* Needs to be optimized */
+//        int outputSelect = regFile.get(Reg.NR51);
+//        int left = 0;
+//        int right = 0;
+//
+//        for (int i = 0; i < channels.length; i++) {
+//            if (test(outputSelect, i + 4)) left += amplitudes[i];
+//            if (test(outputSelect, i)) right += amplitudes[i];
+//        }
+//        left /= 4;
+//        right /= 4;
+//
+//        int volumes = regFile.get(Reg.NR50);
+//        left *= extract(volumes, 4, 3);
+//        right *= clip(3, volumes);
+
 //        output.play((byte) left, (byte) right);
     }
 
