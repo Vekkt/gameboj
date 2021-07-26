@@ -53,13 +53,16 @@ public final class Sweep extends Square {
     @Override
     public int clock() {
         envelope.clock();
-        if (!updateSweep()) return 0;
+        // Avoid short-circuit evaluation
+        boolean b = updateSweep();
+        b = updateLength() && b;
+        if (!(b && dacEnabled)) return 0;
         return reallyClock();
     }
 
     private void startSweep() {
         counterEnabled = false;
-        counter = 8192;
+        counter = DIVIDER / 4;
     }
 
     private void clockSweep() {
