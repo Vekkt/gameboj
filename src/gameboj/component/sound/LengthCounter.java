@@ -31,7 +31,26 @@ public class LengthCounter {
         boolean enable = test(data, 6);
         boolean trigger = test(data, 7);
 
-        if (trigger && length == 0) setLength(fullLength);
+        if (enabled) {
+            if (length == 0 && trigger) {
+                if (enable && counter < DIVIDER / 2) {
+                    setLength(fullLength - 1);
+                } else {
+                    setLength(fullLength);
+                }
+            }
+        } else if (enable) {
+            if (length > 0 && counter < DIVIDER / 2) {
+                length--;
+            }
+            if (length == 0 && trigger && counter < DIVIDER / 2) {
+                setLength(fullLength - 1);
+            }
+        } else {
+            if (length == 0 && trigger) {
+                setLength(fullLength);
+            }
+        }
         enabled = enable;
     }
 
