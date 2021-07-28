@@ -1,7 +1,7 @@
 package gameboj.gui;
 
 import gameboj.Preconditions;
-import gameboj.component.sound.SoundOutput;
+import gameboj.component.apu.SoundOutput;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;

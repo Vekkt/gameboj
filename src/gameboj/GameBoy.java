@@ -8,7 +8,7 @@ import gameboj.component.lcd.LcdController;
 import gameboj.component.memory.BootRomController;
 import gameboj.component.memory.Ram;
 import gameboj.component.memory.RamController;
-import gameboj.component.sound.Apu;
+import gameboj.component.apu.Apu;
 import gameboj.gui.AudioConverter;
 
 import java.util.Objects;

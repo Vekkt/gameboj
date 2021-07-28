@@ -1,7 +1,7 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 import static gameboj.bits.Bits.*;
-import static gameboj.component.sound.Apu.ChannelType;
+import static gameboj.component.apu.Apu.ChannelType;
 
 public final class Noise extends SoundChannel {
     private final static int LFSR_INITIAL = 0x7FF;

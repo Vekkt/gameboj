@@ -1,7 +1,7 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 import gameboj.component.memory.Ram;
-import gameboj.component.sound.Apu.ChannelType;
+import gameboj.component.apu.Apu.ChannelType;
 
 import static gameboj.AddressMap.*;
 import static gameboj.bits.Bits.extract;

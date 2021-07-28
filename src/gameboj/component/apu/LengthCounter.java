@@ -1,4 +1,4 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 
 import static gameboj.GameBoy.CLOCK_FREQ;

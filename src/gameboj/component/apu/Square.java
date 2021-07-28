@@ -1,7 +1,7 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 import static gameboj.bits.Bits.*;
-import static gameboj.component.sound.Apu.ChannelType;
+import static gameboj.component.apu.Apu.ChannelType;
 
 public class Square extends SoundChannel{
     private final static int[] DUTY_PATTERN = new int[] {

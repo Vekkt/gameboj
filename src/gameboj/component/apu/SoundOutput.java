@@ -1,4 +1,4 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 public interface SoundOutput {
     void start();
