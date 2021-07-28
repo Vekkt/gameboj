@@ -1,4 +1,4 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 import gameboj.Register;
 import gameboj.RegisterFile;
@@ -6,7 +6,7 @@ import gameboj.component.Component;
 
 import static gameboj.bits.Bits.*;
 import static gameboj.AddressMap.*;
-import static gameboj.component.sound.Apu.ChannelType;
+import static gameboj.component.apu.Apu.ChannelType;
 
 public abstract class SoundChannel implements Component {
     private final static int[][] CHANNEL_MASKS = new int[][] {
@@ -79,7 +79,7 @@ public abstract class SoundChannel implements Component {
         if (!length.isEnabled()) {
             return channelEnabled;
         }
-        if (channelEnabled && length.length() == 0) {
+        if (length.length() == 0) {
             channelEnabled = false;
         }
         return channelEnabled;

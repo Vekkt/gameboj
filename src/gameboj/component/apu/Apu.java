@@ -1,4 +1,4 @@
-package gameboj.component.sound;
+package gameboj.component.apu;
 
 import gameboj.Register;
 import gameboj.RegisterFile;
@@ -66,7 +66,7 @@ public final class Apu implements Component, Clocked {
 //        int volumes = regFile.get(Reg.NR50);
 //        left *= extract(volumes, 4, 3);
 //        right *= clip(3, volumes);
-
+//
 //        output.play((byte) left, (byte) right);
     }
 
@@ -82,10 +82,11 @@ public final class Apu implements Component, Clocked {
             case REG_OUTPUT_CONTROL:
                 return regFile.get(Reg.NR51) | MASKS[Reg.NR51.ordinal()];
             case REG_STATUS:
-                int result = enabled ? mask(7) : 0;
+                int data = enabled ? mask(7) : 0;
                 for (int i = 0; i < channels.length; i++)
-                    result |= channels[i].isEnabled() ? mask(i) : 0;
-                return result | MASKS[Reg.NR52.ordinal()];
+                    data |= channels[i].isEnabled() ? mask(i) : 0;
+                System.out.printf("Read at 0x%X data: 0x%X (0b%s)%n", address, data, String.format("%8s", Integer.toBinaryString(data)).replace(' ', '0'));
+                return data | MASKS[Reg.NR52.ordinal()];
             default:
                 if (REG_WAVE_TAB_START <= address && address < REG_WAVE_TAB_END) {
                     return channels[2].read(address);
