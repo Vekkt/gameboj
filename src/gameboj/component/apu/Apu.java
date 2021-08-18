@@ -52,21 +52,21 @@ public final class Apu implements Component, Clocked {
             amplitudes[i] = channels[i].clock();
 
         /* Needs to be optimized */
-//        int outputSelect = regFile.get(Reg.NR51);
-//        int left = 0;
-//        int right = 0;
-//
-//        for (int i = 0; i < channels.length; i++) {
-//            if (test(outputSelect, i + 4)) left += amplitudes[i];
-//            if (test(outputSelect, i)) right += amplitudes[i];
-//        }
-//        left /= 4;
-//        right /= 4;
-//
-//        int volumes = regFile.get(Reg.NR50);
-//        left *= extract(volumes, 4, 3);
-//        right *= clip(3, volumes);
-//
+        int outputSelect = regFile.get(Reg.NR51);
+        int left = 0;
+        int right = 0;
+
+        for (int i = 0; i < channels.length; i++) {
+            if (test(outputSelect, i + 4)) left += amplitudes[i];
+            if (test(outputSelect, i)) right += amplitudes[i];
+        }
+        left /= 4;
+        right /= 4;
+
+        int volumes = regFile.get(Reg.NR50);
+        left *= extract(volumes, 4, 3);
+        right *= clip(3, volumes);
+
 //        output.play((byte) left, (byte) right);
     }
 
@@ -85,7 +85,6 @@ public final class Apu implements Component, Clocked {
                 int data = enabled ? mask(7) : 0;
                 for (int i = 0; i < channels.length; i++)
                     data |= channels[i].isEnabled() ? mask(i) : 0;
-                System.out.printf("Read at 0x%X data: 0x%X (0b%s)%n", address, data, String.format("%8s", Integer.toBinaryString(data)).replace(' ', '0'));
                 return data | MASKS[Reg.NR52.ordinal()];
             default:
                 if (REG_WAVE_TAB_START <= address && address < REG_WAVE_TAB_END) {

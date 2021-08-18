@@ -79,7 +79,7 @@ public abstract class SoundChannel implements Component {
         if (!length.isEnabled()) {
             return channelEnabled;
         }
-        if (length.length() == 0) {
+        if (channelEnabled && length.length() == 0) {
             channelEnabled = false;
         }
         return channelEnabled;

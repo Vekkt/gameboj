@@ -26,7 +26,6 @@ public final class Sweep extends Square {
     public void write(int address, int data) {
         if (regStartAddress <= address && address < regEndAddress) {
             Reg reg = Reg.values()[address - regStartAddress];
-            if (reg == Reg.NR4)
             super.write(address, data);
             switch (reg) {
                 case NR0:
@@ -71,9 +70,9 @@ public final class Sweep extends Square {
             counter = 0;
             if (counterEnabled && --timer == 0) {
                 timer = sweepPeriod == 0 ? 8 : sweepPeriod;
-                if (sweepPeriod > 0) {
+                if (sweepPeriod != 0) {
                     int newFreq = updateShadowFrequency();
-                    if (!overflow && shift > 0) {
+                    if (!overflow && shift != 0) {
                         shadowFrequency = newFreq;
                         regFile.set(Reg.NR3, shadowFrequency & 0xFF);
                         regFile.set(Reg.NR4,
@@ -91,10 +90,9 @@ public final class Sweep extends Square {
 
         shadowFrequency = getFrequency();
         timer = sweepPeriod == 0 ? 8 : sweepPeriod;
-        counterEnabled = sweepPeriod > 0 || shift > 0;
+        counterEnabled = sweepPeriod != 0 || shift != 0;
 
         if (shift > 0) updateShadowFrequency();
-        else System.out.println("Shift is 0");
     }
 
     private int updateShadowFrequency() {
