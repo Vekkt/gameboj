@@ -71,25 +71,37 @@ public final class Apu implements Component, Clocked {
     }
 
     @Override public int read(int address) {
+        return read(address, false);
+    }
+
+    public int read(int address, boolean unmasked) {
         if (REG_STATUS < address && address < REG_WAVE_TAB_START) {
             return 0xFF;
         }
         if (REGS_CH1_START <= address && address < REGS_CH4_END) {
-            return channels[(address - REGS_CH1_START) / 5].read(address);
+            if (unmasked) {
+                return channels[(address - REGS_CH1_START) / 5].read(address, true);
+            } else {
+                return channels[(address - REGS_CH1_START) / 5].read(address);
+            }
         } else switch (address) {
-            case REG_VIN_CONTROL:
+            case REG_VIN_CONTROL -> {
                 return regFile.get(Reg.NR50) | MASKS[Reg.NR50.ordinal()];
-            case REG_OUTPUT_CONTROL:
+            }
+            case REG_OUTPUT_CONTROL -> {
                 return regFile.get(Reg.NR51) | MASKS[Reg.NR51.ordinal()];
-            case REG_STATUS:
+            }
+            case REG_STATUS -> {
                 int data = enabled ? mask(7) : 0;
                 for (int i = 0; i < channels.length; i++)
                     data |= channels[i].isEnabled() ? mask(i) : 0;
                 return data | MASKS[Reg.NR52.ordinal()];
-            default:
+            }
+            default -> {
                 if (REG_WAVE_TAB_START <= address && address < REG_WAVE_TAB_END) {
                     return channels[2].read(address);
                 }
+            }
         }
         return NO_DATA;
     }
@@ -129,9 +141,9 @@ public final class Apu implements Component, Clocked {
     private void start() {
         for (int address = REGS_CH1_START; address <= REG_OUTPUT_CONTROL; ++address) {
             if (address == REG_CH1_LENGTH || address == REG_CH2_LENGTH || address == REG_CH4_LENGTH)
-                write(address, clip(6, read(address)));
+                write(address, clip(6, read(address, true)));
             else if (address == REG_CH3_LENGTH)
-                write(address, read(address));
+                write(address, read(address, true));
             else
                 write(address, 0x00);
         }

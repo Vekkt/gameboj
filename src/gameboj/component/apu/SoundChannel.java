@@ -60,6 +60,18 @@ public abstract class SoundChannel implements Component {
         return NO_DATA;
     }
 
+    public int read(int address, boolean unmasked) {
+        if (regStartAddress <= address && address < regEndAddress) {
+            int idx = address - regStartAddress;
+            int value = regFile.get(Reg.values()[idx]);
+
+            if (unmasked) { return value; }
+            else { return value | channelMasks[idx]; }
+
+        }
+        return NO_DATA;
+    }
+
     @Override public void write(int address, int data) {
         if (regStartAddress <= address && address < regEndAddress) {
             Reg reg = Reg.values()[address - regStartAddress];
