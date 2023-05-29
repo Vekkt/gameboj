@@ -42,10 +42,10 @@ public final class Wave extends SoundChannel {
     @Override
     public void write(int address, int data) {
         if (REG_WAVE_TAB_START <= address && address < REG_WAVE_TAB_END) {
-            if (!isEnabled()) {// obscure behavior
+            if (!isEnabled()) { // obscure behavior
                 waveRAM.write(address - REG_WAVE_TAB_START, data);
             }
-            else if (sinceLastRead < 2)
+            else if (sinceLastRead < 2) // obscure behavior
                 waveRAM.write(lastReadAddr - REG_WAVE_TAB_START, data);
         } else if (regStartAddress <= address && address < regEndAddress) {
             Reg reg = Reg.values()[address - regStartAddress];
@@ -89,7 +89,7 @@ public final class Wave extends SoundChannel {
             } else {
                 output = readWave();
             }
-            wavePosition = (wavePosition + 1) % 8;
+            wavePosition = (wavePosition + 1) % 32;
         }
         return output;
     }
@@ -113,8 +113,8 @@ public final class Wave extends SoundChannel {
         lastReadAddr = REG_WAVE_TAB_START + wavePosition / 2;
         buffer = waveRAM.read(lastReadAddr - REG_WAVE_TAB_START);
         int b = buffer;
-        if (wavePosition % 2 == 0) b = (b >> 4) & 0x0F;
-        else b &= 0x0F;
+        if (wavePosition % 2 == 0) b = extract(b, 4, 4);
+        else b = clip(b, 4);
 
         return switch (volume()) {
             case 0 -> 0;
