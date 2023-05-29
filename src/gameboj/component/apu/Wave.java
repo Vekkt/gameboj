@@ -50,15 +50,13 @@ public final class Wave extends SoundChannel {
         } else if (regStartAddress <= address && address < regEndAddress) {
             Reg reg = Reg.values()[address - regStartAddress];
             switch (reg) {
-                case NR0:
+                case NR0 -> {
                     dacEnabled = test(data, 7);
                     channelEnabled &= dacEnabled;
-                    break;
-                case NR1:
-                    length.setLength(256 - data);
-                    break;
-                case NR4: // obscure behavior
-                    if(test(data, 7)) {
+                }
+                case NR1 -> length.setLength(256 - data);
+                case NR4 -> { // obscure behavior
+                    if (test(data, 7)) {
                         if (isEnabled() && freqDiv == 2) {
                             int pos = wavePosition / 2;
                             if (pos < 4) {
@@ -71,6 +69,7 @@ public final class Wave extends SoundChannel {
                             }
                         }
                     }
+                }
             }
             super.write(address, data);
         }
@@ -117,14 +116,13 @@ public final class Wave extends SoundChannel {
         if (wavePosition % 2 == 0) b = (b >> 4) & 0x0F;
         else b &= 0x0F;
 
-        switch (volume()) {
-            case 0: return 0;
-            case 1: return b;
-            case 2: return b >> 1;
-            case 3: return b >> 2;
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (volume()) {
+            case 0 -> 0;
+            case 1 -> b;
+            case 2 -> b >> 1;
+            case 3 -> b >> 2;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     private int volume() {

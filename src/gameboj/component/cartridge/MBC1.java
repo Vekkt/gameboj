@@ -59,53 +59,36 @@ public final class MBC1 implements Component {
 
 	@Override
 	public int read(int address) {
-		switch (Bits.extract(checkBits16(address), 13, 3)) {
-		case 0:
-		case 1:
-			return rom.read(romAddress(msb2(), 0, address));
-		case 2:
-		case 3:
-			return rom.read(romAddress(ramRom2, romLsb5, address));
-		case 5:
-			return ramEnabled ? ram.read(ramAddress(address)) : 0xFF;
-		default:
-			return NO_DATA;
-		}
+        return switch (Bits.extract(checkBits16(address), 13, 3)) {
+            case 0, 1 -> rom.read(romAddress(msb2(), 0, address));
+            case 2, 3 -> rom.read(romAddress(ramRom2, romLsb5, address));
+            case 5 -> ramEnabled ? ram.read(ramAddress(address)) : 0xFF;
+            default -> NO_DATA;
+        };
 	}
 
 	@Override
 	public void write(int address, int data) {
 		checkBits8(data);
-		switch (Bits.extract(checkBits16(address), 13, 3)) {
-		case 0:
-			ramEnabled = Bits.clip(4, data) == RAM_ENABLE;
-			break;
-		case 1:
-			romLsb5 = Math.max(1, Bits.clip(5, data));
-			break;
-		case 2:
-			ramRom2 = Bits.clip(2, data);
-			break;
-		case 3:
-			mode = Bits.test(data, 0) ? Mode.MODE_1 : Mode.MODE_0;
-			break;
-		case 5:
-			if (ramEnabled) {
-				ram.write(ramAddress(address), data);
-			}
-			break;
-		}
+        switch (Bits.extract(checkBits16(address), 13, 3)) {
+            case 0 -> ramEnabled = Bits.clip(4, data) == RAM_ENABLE;
+            case 1 -> romLsb5 = Math.max(1, Bits.clip(5, data));
+            case 2 -> ramRom2 = Bits.clip(2, data);
+            case 3 -> mode = Bits.test(data, 0) ? Mode.MODE_1 : Mode.MODE_0;
+            case 5 -> {
+                if (ramEnabled) {
+                    ram.write(ramAddress(address), data);
+                }
+            }
+        }
 	}
 
 	private int msb2() {
-		switch (mode) {
-		case MODE_0:
-			return 0;
-		case MODE_1:
-			return ramRom2;
-		default:
-			throw new Error();
-		}
+        return switch (mode) {
+            case MODE_0 -> 0;
+            case MODE_1 -> ramRom2;
+            default -> throw new Error();
+        };
 	}
 
 	private int romAddress(int b_20_19, int b_18_14, int b_13_0) {

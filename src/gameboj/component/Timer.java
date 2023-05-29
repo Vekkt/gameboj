@@ -58,18 +58,13 @@ public final class Timer implements Component, Clocked {
 	@Override
 	public int read(int address) {
 		Preconditions.checkBits16(address);
-		switch (address) {
-		case AddressMap.REG_DIV:
-			return Bits.extract(DIV, 8, 8);
-		case AddressMap.REG_TIMA:
-			return TIMA;
-		case AddressMap.REG_TMA:
-			return TMA;
-		case AddressMap.REG_TAC:
-			return TAC;
-		default:
-			return NO_DATA;
-		}
+        return switch (address) {
+            case AddressMap.REG_DIV -> Bits.extract(DIV, 8, 8);
+            case AddressMap.REG_TIMA -> TIMA;
+            case AddressMap.REG_TMA -> TMA;
+            case AddressMap.REG_TAC -> TAC;
+            default -> NO_DATA;
+        };
 	}
 
 	/**
@@ -84,19 +79,12 @@ public final class Timer implements Component, Clocked {
 	public void write(int address, int data) {
 		Preconditions.checkBits16(address);
 		Preconditions.checkBits8(data);
-		switch (address) {
-		case AddressMap.REG_DIV:
-			update(regName.DIV, 0);
-			break;
-		case AddressMap.REG_TIMA:
-			TIMA = data;
-			break;
-		case AddressMap.REG_TMA:
-			TMA = data;
-			break;
-		case AddressMap.REG_TAC:
-			update(regName.TAC, data);
-		}
+        switch (address) {
+            case AddressMap.REG_DIV -> update(regName.DIV, 0);
+            case AddressMap.REG_TIMA -> TIMA = data;
+            case AddressMap.REG_TMA -> TMA = data;
+            case AddressMap.REG_TAC -> update(regName.TAC, data);
+        }
 	}
 
 	private boolean state() {

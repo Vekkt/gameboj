@@ -100,13 +100,9 @@ public final class Apu implements Component, Clocked {
         } else if (REG_WAVE_TAB_START <= address && address < REG_WAVE_TAB_END) {
             channels[2].write(address, data);
         } else switch (address) {
-            case REG_VIN_CONTROL:
-                regFile.set(Reg.NR50, data);
-                break;
-            case REG_OUTPUT_CONTROL:
-                regFile.set(Reg.NR51, data);
-                break;
-            case REG_STATUS:
+            case REG_VIN_CONTROL -> regFile.set(Reg.NR50, data);
+            case REG_OUTPUT_CONTROL -> regFile.set(Reg.NR51, data);
+            case REG_STATUS -> {
                 if (!test(data, 7)) {
                     if (enabled) {
                         enabled = false;
@@ -118,8 +114,9 @@ public final class Apu implements Component, Clocked {
                         start();
                     }
                 }
-                break;
-            default:
+            }
+            default -> {
+            }
         }
     }
 

@@ -12,7 +12,7 @@ public final class Sweep extends Square {
     private boolean overflow;
     private boolean negate;
 
-    private int shadowFrequency;
+    private int shadowFreq;
     private int sweepPeriod;
     private int counter;
     private int timer;
@@ -28,18 +28,19 @@ public final class Sweep extends Square {
             Reg reg = Reg.values()[address - regStartAddress];
             super.write(address, data);
             switch (reg) {
-                case NR0:
+                case NR0 -> {
                     sweepPeriod = extract(data, 5, 3);
                     negate = test(data, 3);
                     shift = clip(3, data);
                     if (isIncrementing && !negate) overflow = true;
-                    break;
-                case NR4:
+                }
+                case NR4 -> {
                     if (test(data, 7)) {
                         triggerSweep();
                     }
-                    break;
-                default:
+                }
+                default -> {
+                }
             }
         }
     }
@@ -73,10 +74,9 @@ public final class Sweep extends Square {
                 if (sweepPeriod != 0) {
                     int newFreq = updateShadowFrequency();
                     if (!overflow && shift != 0) {
-                        shadowFrequency = newFreq;
-                        regFile.set(Reg.NR3, shadowFrequency & 0xFF);
-                        regFile.set(Reg.NR4,
-                                (regFile.get(Reg.NR4) & 0xF8) | extract(shadowFrequency, Byte.SIZE, 3));
+                        shadowFreq = newFreq;
+                        regFile.set(Reg.NR3, clip(8, shadowFreq));
+                        regFile.set(Reg.NR4, extract(shadowFreq, 8, 3));
                         updateShadowFrequency();
                     }
                 }
@@ -88,7 +88,7 @@ public final class Sweep extends Square {
         isIncrementing = false;
         overflow = false;
 
-        shadowFrequency = getFrequency();
+        shadowFreq = getFrequency();
         timer = sweepPeriod == 0 ? 8 : sweepPeriod;
         counterEnabled = sweepPeriod != 0 || shift != 0;
 
@@ -96,12 +96,12 @@ public final class Sweep extends Square {
     }
 
     private int updateShadowFrequency() {
-        int newFreq = shadowFrequency >> shift;
+        int newFreq = shadowFreq >> shift;
         if (negate) {
-            newFreq = shadowFrequency - newFreq;
+            newFreq = shadowFreq - newFreq;
             isIncrementing = true;
         } else {
-            newFreq = shadowFrequency + newFreq;
+            newFreq = shadowFreq + newFreq;
         }
 
         if (newFreq > 2047) overflow = true;

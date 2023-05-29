@@ -127,537 +127,465 @@ public final class Cpu implements Component, Clocked {
 		int nextPC = PC + opCode.totalBytes;
 
 		switch (opCode.family) {
-		case NOP: { }
-			break;
-		// Load
-		case LD_R8_HLR: {
-			Reg r = extractReg(opCode, 3);
-			regFile.set(r, read8AtHl());
-		}
-			break;
-		case LD_A_HLRU: {
-			int s = extractHlIncrement(opCode);
-			regFile.set(Reg.A, read8AtHl());
-			setReg16(Reg16.HL, Bits.clip(16, reg16(Reg16.HL) + s));
-		}
-			break;
-		case LD_A_N8R: {
-			int N8 = read8AfterOpcode();
-			regFile.set(Reg.A, read8(REGS_START + N8));
-		}
-			break;
-		case LD_A_CR: {
-			int C = regFile.get(Reg.C);
-			regFile.set(Reg.A, read8(REGS_START + C));
-		}
-			break;
-		case LD_A_N16R: {
-			int N16 = read16AfterOpcode();
-			regFile.set(Reg.A, read8(N16));
-		}
-			break;
-		case LD_A_BCR: {
-			int BC = reg16(Reg16.BC);
-			regFile.set(Reg.A, read8(BC));
-		}
-			break;
-		case LD_A_DER: {
-			int DE = reg16(Reg16.DE);
-			regFile.set(Reg.A, read8(DE));
-		}
-			break;
-		case LD_R8_N8: {
-			Reg R8 = extractReg(opCode, 3);
-			int N8 = read8AfterOpcode();
-			regFile.set(R8, N8);
-		}
-			break;
-		case LD_R16SP_N16: {
-			Reg16 R16 = extractReg16(opCode);
-			int N16 = read16AfterOpcode();
-			setReg16SP(R16, N16);
-		}
-			break;
-		case POP_R16: {
-			Reg16 R16 = extractReg16(opCode);
-			int val = pop16();
-			setReg16(R16, val);
-		}
-			break;
-
-		// Store
-		case LD_HLR_R8: {
-			int val = regFile.get(extractReg(opCode, 0));
-			write8AtHl(val);
-		}
-			break;
-		case LD_HLRU_A: {
-			int s = extractHlIncrement(opCode);
-			int val = regFile.get(Reg.A);
-			write8AtHl(val);
-			setReg16(Reg16.HL, Bits.clip(16, reg16(Reg16.HL) + s));
-		}
-			break;
-		case LD_N8R_A: {
-			int N8 = read8AfterOpcode();
-			write8((REGS_START + N8), regFile.get(Reg.A));
-		}
-			break;
-		case LD_CR_A: {
-			write8(REGS_START + regFile.get(Reg.C), regFile.get(Reg.A));
-		}
-			break;
-		case LD_N16R_A: {
-			int N16 = read16AfterOpcode();
-			write8(N16, regFile.get(Reg.A));
-		}
-			break;
-		case LD_BCR_A: {
-			int BC = reg16(Reg16.BC);
-			write8(BC, regFile.get(Reg.A));
-		}
-			break;
-		case LD_DER_A: {
-			int DE = reg16(Reg16.DE);
-			write8(DE, regFile.get(Reg.A));
-		}
-			break;
-		case LD_HLR_N8: {
-			int N8 = read8AfterOpcode();
-			write8(reg16(Reg16.HL), N8);
-		}
-			break;
-		case LD_N16R_SP: {
-			int N16 = read16AfterOpcode();
-			write16(N16, SP);
-		}
-			break;
-		case PUSH_R16: {
-			Reg16 R16 = extractReg16(opCode);
-			push16(reg16(R16));
-		}
-			break;
-		case LD_R8_R8: {
-			Reg R8 = extractReg(opCode, 3);
-			Reg S8 = extractReg(opCode, 0);
-			if (R8 != S8) {
-				regFile.set(R8, regFile.get(S8));
+			case NOP -> {
 			}
-		}
-			break;
-		case LD_SP_HL: {
-			SP = reg16(Reg16.HL);
-		}
-			break;
 
-		// Add
-		case ADD_A_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			boolean C = getCarry(opCode, false);
-			int vf = Alu.add(regFile.get(Reg.A), regFile.get(R8), C);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case ADD_A_N8: {
-			int N8 = read8AfterOpcode();
-			boolean C = getCarry(opCode, false);
-			int vf = Alu.add(regFile.get(Reg.A), N8, C);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case ADD_A_HLR: {
-			boolean C = getCarry(opCode, false);
-			int vf = Alu.add(regFile.get(Reg.A), read8AtHl(), C);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case INC_R8: {
-			Reg R8 = extractReg(opCode, 3);
-			int vf = Alu.add(regFile.get(R8), 1);
-			setRegFromAlu(R8, vf);
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.CPU);
-		}
-			break;
-		case INC_HLR: {
-			int vf = Alu.add(read8AtHl(), 1);
-			write8(reg16(Reg16.HL), Bits.clip(8, Alu.unpackValue(vf)));
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.CPU);
-		}
-			break;
-		case INC_R16SP: {
-			Reg16 R16 = extractReg16(opCode);
-			int val = R16 == Reg16.AF ? SP : reg16(R16);
-			int vf = Alu.add16L(val, 1);
-			if (R16 == Reg16.AF)
-				SP = Alu.unpackValue(vf);
-			else
-				setReg16SP(R16, Alu.unpackValue(vf));
-		}
-			break;
-		case ADD_HL_R16SP: {
-			Reg16 R16 = extractReg16(opCode);
-			int val = R16 == Reg16.AF ? SP : reg16(R16);
-			int vf = Alu.add16H(reg16(Reg16.HL), val);
-			setReg16(Reg16.HL, Alu.unpackValue(vf));
-			combineAluFlags(vf, FlagSrc.CPU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.ALU);
-		}
-			break;
-		case LD_HLSP_S8: {
-			int S8 = Bits.clip(16, Bits.signExtend8(read8AfterOpcode()));
-			int vf = Alu.add16L(SP, S8);
-			combineAluFlags(vf, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU, FlagSrc.ALU);
+			// Load
+			case LD_R8_HLR -> {
+				Reg r = extractReg(opCode, 3);
+				regFile.set(r, read8AtHl());
+			}
+			case LD_A_HLRU -> {
+				int s = extractHlIncrement(opCode);
+				regFile.set(Reg.A, read8AtHl());
+				setReg16(Reg16.HL, Bits.clip(16, reg16(Reg16.HL) + s));
+			}
+			case LD_A_N8R -> {
+				int N8 = read8AfterOpcode();
+				regFile.set(Reg.A, read8(REGS_START + N8));
+			}
+			case LD_A_CR -> {
+				int C = regFile.get(Reg.C);
+				regFile.set(Reg.A, read8(REGS_START + C));
+			}
+			case LD_A_N16R -> {
+				int N16 = read16AfterOpcode();
+				regFile.set(Reg.A, read8(N16));
+			}
+			case LD_A_BCR -> {
+				int BC = reg16(Reg16.BC);
+				regFile.set(Reg.A, read8(BC));
+			}
+			case LD_A_DER -> {
+				int DE = reg16(Reg16.DE);
+				regFile.set(Reg.A, read8(DE));
+			}
+			case LD_R8_N8 -> {
+				Reg R8 = extractReg(opCode, 3);
+				int N8 = read8AfterOpcode();
+				regFile.set(R8, N8);
+			}
+			case LD_R16SP_N16 -> {
+				Reg16 R16 = extractReg16(opCode);
+				int N16 = read16AfterOpcode();
+				setReg16SP(R16, N16);
+			}
+			case POP_R16 -> {
+				Reg16 R16 = extractReg16(opCode);
+				int val = pop16();
+				setReg16(R16, val);
+			}
 
-			if (!Bits.test(opCode.encoding, 4))
-				SP = Alu.unpackValue(vf);
-			else
+
+			// Store
+			case LD_HLR_R8 -> {
+				int val = regFile.get(extractReg(opCode, 0));
+				write8AtHl(val);
+			}
+			case LD_HLRU_A -> {
+				int s = extractHlIncrement(opCode);
+				int val = regFile.get(Reg.A);
+				write8AtHl(val);
+				setReg16(Reg16.HL, Bits.clip(16, reg16(Reg16.HL) + s));
+			}
+			case LD_N8R_A -> {
+				int N8 = read8AfterOpcode();
+				write8((REGS_START + N8), regFile.get(Reg.A));
+			}
+			case LD_CR_A -> {
+				write8(REGS_START + regFile.get(Reg.C), regFile.get(Reg.A));
+			}
+			case LD_N16R_A -> {
+				int N16 = read16AfterOpcode();
+				write8(N16, regFile.get(Reg.A));
+			}
+			case LD_BCR_A -> {
+				int BC = reg16(Reg16.BC);
+				write8(BC, regFile.get(Reg.A));
+			}
+			case LD_DER_A -> {
+				int DE = reg16(Reg16.DE);
+				write8(DE, regFile.get(Reg.A));
+			}
+			case LD_HLR_N8 -> {
+				int N8 = read8AfterOpcode();
+				write8(reg16(Reg16.HL), N8);
+			}
+			case LD_N16R_SP -> {
+				int N16 = read16AfterOpcode();
+				write16(N16, SP);
+			}
+			case PUSH_R16 -> {
+				Reg16 R16 = extractReg16(opCode);
+				push16(reg16(R16));
+			}
+			case LD_R8_R8 -> {
+				Reg R8 = extractReg(opCode, 3);
+				Reg S8 = extractReg(opCode, 0);
+				if (R8 != S8) {
+					regFile.set(R8, regFile.get(S8));
+				}
+			}
+			case LD_SP_HL -> {
+				SP = reg16(Reg16.HL);
+			}
+
+
+			// Add
+			case ADD_A_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				boolean C = getCarry(opCode, false);
+				int vf = Alu.add(regFile.get(Reg.A), regFile.get(R8), C);
+				setRegFlags(Reg.A, vf);
+			}
+			case ADD_A_N8 -> {
+				int N8 = read8AfterOpcode();
+				boolean C = getCarry(opCode, false);
+				int vf = Alu.add(regFile.get(Reg.A), N8, C);
+				setRegFlags(Reg.A, vf);
+			}
+			case ADD_A_HLR -> {
+				boolean C = getCarry(opCode, false);
+				int vf = Alu.add(regFile.get(Reg.A), read8AtHl(), C);
+				setRegFlags(Reg.A, vf);
+			}
+			case INC_R8 -> {
+				Reg R8 = extractReg(opCode, 3);
+				int vf = Alu.add(regFile.get(R8), 1);
+				setRegFromAlu(R8, vf);
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.CPU);
+			}
+			case INC_HLR -> {
+				int vf = Alu.add(read8AtHl(), 1);
+				write8(reg16(Reg16.HL), Bits.clip(8, Alu.unpackValue(vf)));
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.CPU);
+			}
+			case INC_R16SP -> {
+				Reg16 R16 = extractReg16(opCode);
+				int val = R16 == Reg16.AF ? SP : reg16(R16);
+				int vf = Alu.add16L(val, 1);
+				if (R16 == Reg16.AF)
+					SP = Alu.unpackValue(vf);
+				else
+					setReg16SP(R16, Alu.unpackValue(vf));
+			}
+			case ADD_HL_R16SP -> {
+				Reg16 R16 = extractReg16(opCode);
+				int val = R16 == Reg16.AF ? SP : reg16(R16);
+				int vf = Alu.add16H(reg16(Reg16.HL), val);
 				setReg16(Reg16.HL, Alu.unpackValue(vf));
-		}
-			break;
-
-		// Subtract
-		case SUB_A_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			boolean C = getCarry(opCode, false);
-			int vf = Alu.sub(regFile.get(Reg.A), regFile.get(R8), C);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case SUB_A_N8: {
-			int N8 = read8AfterOpcode();
-			boolean C = getCarry(opCode, false);
-			int vf = Alu.sub(regFile.get(Reg.A), N8, C);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case SUB_A_HLR: {
-			boolean C = getCarry(opCode, false);
-			int vf = Alu.sub(regFile.get(Reg.A), read8AtHl(), C);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case DEC_R8: {
-			Reg R8 = extractReg(opCode, 3);
-			int vf = Alu.sub(regFile.get(R8), 1);
-			setRegFromAlu(R8, vf);
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V1, FlagSrc.ALU, FlagSrc.CPU);
-		}
-			break;
-		case DEC_HLR: {
-			int vf = Alu.sub(read8AtHl(), 1);
-			write8AtHl(Bits.clip(8, Alu.unpackValue(vf)));
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V1, FlagSrc.ALU, FlagSrc.CPU);
-		}
-			break;
-		case CP_A_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.sub(regFile.get(Reg.A), regFile.get(R8));
-			setFlags(vf);
-		}
-			break;
-		case CP_A_N8: {
-			int N8 = read8AfterOpcode();
-			int vf = Alu.sub(regFile.get(Reg.A), N8);
-			setFlags(vf);
-		}
-			break;
-		case CP_A_HLR: {
-			int vf = Alu.sub(regFile.get(Reg.A), read8AtHl());
-			setFlags(vf);
-		}
-			break;
-		case DEC_R16SP: {
-			Reg16 R16 = extractReg16(opCode);
-			if (R16 == Reg16.AF)
-				SP = Bits.clip(16, SP - 1);
-			else
-				setReg16(R16, Bits.clip(16, reg16(R16) - 1));
-		}
-			break;
-
-		// And, or, xor, complement
-		case AND_A_N8: {
-			int N8 = read8AfterOpcode();
-			int vf = Alu.and(regFile.get(Reg.A), N8);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case AND_A_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.and(regFile.get(Reg.A), regFile.get(R8));
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case AND_A_HLR: {
-			int vf = Alu.and(regFile.get(Reg.A), read8AtHl());
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case OR_A_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.or(regFile.get(Reg.A), regFile.get(R8));
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case OR_A_N8: {
-			int N8 = read8AfterOpcode();
-			int vf = Alu.or(regFile.get(Reg.A), N8);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case OR_A_HLR: {
-			int vf = Alu.or(regFile.get(Reg.A), read8AtHl());
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case XOR_A_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.xor(regFile.get(Reg.A), regFile.get(R8));
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case XOR_A_N8: {
-			int N8 = read8AfterOpcode();
-			int vf = Alu.xor(regFile.get(Reg.A), N8);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case XOR_A_HLR: {
-			int vf = Alu.xor(regFile.get(Reg.A), read8AtHl());
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-		case CPL: {
-			boolean z = Bits.test(regFile.get(Reg.F), 7);
-			boolean c = Bits.test(regFile.get(Reg.F), 4);
-			int v = Bits.complement8(regFile.get(Reg.A));
-			int vf = Alu.packValueZNHC(v, z, true, true, c);
-			setRegFlags(Reg.A, vf);
-		}
-			break;
-
-		// Rotate, shift
-		case ROTCA: {
-			RotDir dir = extractDirection(opCode);
-			int vf = Alu.rotate(dir, regFile.get(Reg.A));
-			setRegFromAlu(Reg.A, vf);
-			combineAluFlags(vf, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU);
-		}
-			break;
-		case ROTA: {
-			RotDir dir = extractDirection(opCode);
-			boolean C = Bits.test(regFile.get(Reg.F), 4);
-			int vf = Alu.rotate(dir, regFile.get(Reg.A), C);
-			setRegFromAlu(Reg.A, vf);
-			combineAluFlags(vf, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU);
-		}
-			break;
-		case ROTC_R8: {
-			RotDir dir = extractDirection(opCode);
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.rotate(dir, regFile.get(R8));
-			setRegFlags(R8, vf);
-		}
-			break;
-		case ROT_R8: {
-			RotDir dir = extractDirection(opCode);
-			Reg R8 = extractReg(opCode, 0);
-			boolean C = Bits.test(regFile.get(Reg.F), 4);
-			int vf = Alu.rotate(dir, regFile.get(R8), C);
-			setRegFlags(R8, vf);
-		}
-			break;
-		case ROTC_HLR: {
-			RotDir dir = extractDirection(opCode);
-			int vf = Alu.rotate(dir, read8AtHl());
-			write8AtHlAndSetFlags(vf);
-		}
-			break;
-		case ROT_HLR: {
-			RotDir dir = extractDirection(opCode);
-			boolean C = Bits.test(regFile.get(Reg.F), 4);
-			int vf = Alu.rotate(dir, read8AtHl(), C);
-			write8AtHlAndSetFlags(vf);
-		}
-			break;
-		case SWAP_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.swap(regFile.get(R8));
-			setRegFlags(R8, vf);
-		}
-			break;
-		case SWAP_HLR: {
-			int vf = Alu.swap(read8AtHl());
-			write8AtHlAndSetFlags(vf);
-		}
-			break;
-		case SLA_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.shiftLeft(regFile.get(R8));
-			setRegFlags(R8, vf);
-		}
-			break;
-		case SRA_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.shiftRightA(regFile.get(R8));
-			setRegFlags(R8, vf);
-		}
-			break;
-		case SRL_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int vf = Alu.shiftRightL(regFile.get(R8));
-			setRegFlags(R8, vf);
-		}
-			break;
-		case SLA_HLR: {
-			int vf = Alu.shiftLeft(read8AtHl());
-			write8AtHlAndSetFlags(vf);
-		}
-			break;
-		case SRA_HLR: {
-			int vf = Alu.shiftRightA(read8AtHl());
-			write8AtHlAndSetFlags(vf);
-		}
-			break;
-		case SRL_HLR: {
-			int vf = Alu.shiftRightL(read8AtHl());
-			write8AtHlAndSetFlags(vf);
-		}
-			break;
-
-		// Bit test and set
-		case BIT_U3_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int N3 = Bits.extract(opCode.encoding, 3, 3);
-			int vf = Alu.testBit(regFile.get(R8), N3);
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.ALU, FlagSrc.ALU, FlagSrc.CPU);
-		}
-			break;
-		case BIT_U3_HLR: {
-			int HL = read8AtHl();
-			int N3 = Bits.extract(opCode.encoding, 3, 3);
-			int vf = Alu.testBit(HL, N3);
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.CPU);
-		}
-			break;
-		case CHG_U3_R8: {
-			Reg R8 = extractReg(opCode, 0);
-			int N3 = Bits.extract(opCode.encoding, 3, 3);
-			boolean newV = Bits.test(opCode.encoding, 6);
-			regFile.set(R8, Bits.set(regFile.get(R8), N3, newV));
-		}
-			break;
-		case CHG_U3_HLR: {
-			int N3 = Bits.extract(opCode.encoding, 3, 3);
-			boolean newV = Bits.test(opCode.encoding, 6);
-			write8AtHl(Bits.set(read8AtHl(), N3, newV));
-		}
-			break;
-
-		// Misc. ALU
-		case DAA: {
-			int vf = Alu.bcdAdjust(regFile.get(Reg.A), Bits.test(regFile.get(Reg.F), 6),
-					Bits.test(regFile.get(Reg.F), 5), Bits.test(regFile.get(Reg.F), 4));
-			setRegFromAlu(Reg.A, vf);
-			combineAluFlags(vf, FlagSrc.ALU, FlagSrc.CPU, FlagSrc.V0, FlagSrc.ALU);
-		}
-			break;
-		case SCCF: {
-			boolean C = Bits.test(regFile.get(Reg.F), 4);
-			boolean newC = !Bits.test(opCode.encoding, 3) || !C;
-			int vf = Alu.packValueZNHC(0, false, false, false, newC);
-			combineAluFlags(vf, FlagSrc.CPU, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU);
-		}
-			break;
-
-		// Jumps
-		case JP_HL: {
-			nextPC = reg16(Reg16.HL);
-		}
-			break;
-		case JP_N16: {
-			nextPC = read16AfterOpcode();
-		}
-			break;
-		case JP_CC_N16: {
-			int N16 = read16AfterOpcode();
-			boolean cc = extractCondition(opCode);
-			if (cc) {
-				nextPC = N16;
-				nextNonIdleCycle += opCode.additionalCycles;
+				combineAluFlags(vf, FlagSrc.CPU, FlagSrc.V0, FlagSrc.ALU, FlagSrc.ALU);
 			}
-		}
-			break;
-		case JR_E8: {
-			int E8 = Bits.signExtend8(read8AfterOpcode());
-			nextPC = Bits.clip(16, E8 + nextPC);
-		}
-			break;
-		case JR_CC_E8: {
-			int E8 = Bits.signExtend8(read8AfterOpcode());
-			boolean cc = extractCondition(opCode);
-			if (cc) {
-				nextPC = Bits.clip(16, nextPC + E8);
-				nextNonIdleCycle += opCode.additionalCycles;
-			}
-		}
-			break;
+			case LD_HLSP_S8 -> {
+				int S8 = Bits.clip(16, Bits.signExtend8(read8AfterOpcode()));
+				int vf = Alu.add16L(SP, S8);
+				combineAluFlags(vf, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU, FlagSrc.ALU);
 
-		// Calls and returns
-		case CALL_N16: {
-			int N16 = read16AfterOpcode();
-			push16(nextPC);
-			nextPC = N16;
-		}
-			break;
-		case CALL_CC_N16: {
-			int N16 = read16AfterOpcode();
-			boolean cc = extractCondition(opCode);
-			if (cc) {
+				if (!Bits.test(opCode.encoding, 4))
+					SP = Alu.unpackValue(vf);
+				else
+					setReg16(Reg16.HL, Alu.unpackValue(vf));
+			}
+
+
+			// Subtract
+			case SUB_A_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				boolean C = getCarry(opCode, false);
+				int vf = Alu.sub(regFile.get(Reg.A), regFile.get(R8), C);
+				setRegFlags(Reg.A, vf);
+			}
+			case SUB_A_N8 -> {
+				int N8 = read8AfterOpcode();
+				boolean C = getCarry(opCode, false);
+				int vf = Alu.sub(regFile.get(Reg.A), N8, C);
+				setRegFlags(Reg.A, vf);
+			}
+			case SUB_A_HLR -> {
+				boolean C = getCarry(opCode, false);
+				int vf = Alu.sub(regFile.get(Reg.A), read8AtHl(), C);
+				setRegFlags(Reg.A, vf);
+			}
+			case DEC_R8 -> {
+				Reg R8 = extractReg(opCode, 3);
+				int vf = Alu.sub(regFile.get(R8), 1);
+				setRegFromAlu(R8, vf);
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V1, FlagSrc.ALU, FlagSrc.CPU);
+			}
+			case DEC_HLR -> {
+				int vf = Alu.sub(read8AtHl(), 1);
+				write8AtHl(Bits.clip(8, Alu.unpackValue(vf)));
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V1, FlagSrc.ALU, FlagSrc.CPU);
+			}
+			case CP_A_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.sub(regFile.get(Reg.A), regFile.get(R8));
+				setFlags(vf);
+			}
+			case CP_A_N8 -> {
+				int N8 = read8AfterOpcode();
+				int vf = Alu.sub(regFile.get(Reg.A), N8);
+				setFlags(vf);
+			}
+			case CP_A_HLR -> {
+				int vf = Alu.sub(regFile.get(Reg.A), read8AtHl());
+				setFlags(vf);
+			}
+			case DEC_R16SP -> {
+				Reg16 R16 = extractReg16(opCode);
+				if (R16 == Reg16.AF)
+					SP = Bits.clip(16, SP - 1);
+				else
+					setReg16(R16, Bits.clip(16, reg16(R16) - 1));
+			}
+
+
+			// And, or, xor, complement
+			case AND_A_N8 -> {
+				int N8 = read8AfterOpcode();
+				int vf = Alu.and(regFile.get(Reg.A), N8);
+				setRegFlags(Reg.A, vf);
+			}
+			case AND_A_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.and(regFile.get(Reg.A), regFile.get(R8));
+				setRegFlags(Reg.A, vf);
+			}
+			case AND_A_HLR -> {
+				int vf = Alu.and(regFile.get(Reg.A), read8AtHl());
+				setRegFlags(Reg.A, vf);
+			}
+			case OR_A_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.or(regFile.get(Reg.A), regFile.get(R8));
+				setRegFlags(Reg.A, vf);
+			}
+			case OR_A_N8 -> {
+				int N8 = read8AfterOpcode();
+				int vf = Alu.or(regFile.get(Reg.A), N8);
+				setRegFlags(Reg.A, vf);
+			}
+			case OR_A_HLR -> {
+				int vf = Alu.or(regFile.get(Reg.A), read8AtHl());
+				setRegFlags(Reg.A, vf);
+			}
+			case XOR_A_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.xor(regFile.get(Reg.A), regFile.get(R8));
+				setRegFlags(Reg.A, vf);
+			}
+			case XOR_A_N8 -> {
+				int N8 = read8AfterOpcode();
+				int vf = Alu.xor(regFile.get(Reg.A), N8);
+				setRegFlags(Reg.A, vf);
+			}
+			case XOR_A_HLR -> {
+				int vf = Alu.xor(regFile.get(Reg.A), read8AtHl());
+				setRegFlags(Reg.A, vf);
+			}
+			case CPL -> {
+				boolean z = Bits.test(regFile.get(Reg.F), 7);
+				boolean c = Bits.test(regFile.get(Reg.F), 4);
+				int v = Bits.complement8(regFile.get(Reg.A));
+				int vf = Alu.packValueZNHC(v, z, true, true, c);
+				setRegFlags(Reg.A, vf);
+			}
+
+
+			// Rotate, shift
+			case ROTCA -> {
+				RotDir dir = extractDirection(opCode);
+				int vf = Alu.rotate(dir, regFile.get(Reg.A));
+				setRegFromAlu(Reg.A, vf);
+				combineAluFlags(vf, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU);
+			}
+			case ROTA -> {
+				RotDir dir = extractDirection(opCode);
+				boolean C = Bits.test(regFile.get(Reg.F), 4);
+				int vf = Alu.rotate(dir, regFile.get(Reg.A), C);
+				setRegFromAlu(Reg.A, vf);
+				combineAluFlags(vf, FlagSrc.V0, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU);
+			}
+			case ROTC_R8 -> {
+				RotDir dir = extractDirection(opCode);
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.rotate(dir, regFile.get(R8));
+				setRegFlags(R8, vf);
+			}
+			case ROT_R8 -> {
+				RotDir dir = extractDirection(opCode);
+				Reg R8 = extractReg(opCode, 0);
+				boolean C = Bits.test(regFile.get(Reg.F), 4);
+				int vf = Alu.rotate(dir, regFile.get(R8), C);
+				setRegFlags(R8, vf);
+			}
+			case ROTC_HLR -> {
+				RotDir dir = extractDirection(opCode);
+				int vf = Alu.rotate(dir, read8AtHl());
+				write8AtHlAndSetFlags(vf);
+			}
+			case ROT_HLR -> {
+				RotDir dir = extractDirection(opCode);
+				boolean C = Bits.test(regFile.get(Reg.F), 4);
+				int vf = Alu.rotate(dir, read8AtHl(), C);
+				write8AtHlAndSetFlags(vf);
+			}
+			case SWAP_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.swap(regFile.get(R8));
+				setRegFlags(R8, vf);
+			}
+			case SWAP_HLR -> {
+				int vf = Alu.swap(read8AtHl());
+				write8AtHlAndSetFlags(vf);
+			}
+			case SLA_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.shiftLeft(regFile.get(R8));
+				setRegFlags(R8, vf);
+			}
+			case SRA_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.shiftRightA(regFile.get(R8));
+				setRegFlags(R8, vf);
+			}
+			case SRL_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int vf = Alu.shiftRightL(regFile.get(R8));
+				setRegFlags(R8, vf);
+			}
+			case SLA_HLR -> {
+				int vf = Alu.shiftLeft(read8AtHl());
+				write8AtHlAndSetFlags(vf);
+			}
+			case SRA_HLR -> {
+				int vf = Alu.shiftRightA(read8AtHl());
+				write8AtHlAndSetFlags(vf);
+			}
+			case SRL_HLR -> {
+				int vf = Alu.shiftRightL(read8AtHl());
+				write8AtHlAndSetFlags(vf);
+			}
+
+
+			// Bit test and set
+			case BIT_U3_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int N3 = Bits.extract(opCode.encoding, 3, 3);
+				int vf = Alu.testBit(regFile.get(R8), N3);
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.ALU, FlagSrc.ALU, FlagSrc.CPU);
+			}
+			case BIT_U3_HLR -> {
+				int HL = read8AtHl();
+				int N3 = Bits.extract(opCode.encoding, 3, 3);
+				int vf = Alu.testBit(HL, N3);
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.V0, FlagSrc.V1, FlagSrc.CPU);
+			}
+			case CHG_U3_R8 -> {
+				Reg R8 = extractReg(opCode, 0);
+				int N3 = Bits.extract(opCode.encoding, 3, 3);
+				boolean newV = Bits.test(opCode.encoding, 6);
+				regFile.set(R8, Bits.set(regFile.get(R8), N3, newV));
+			}
+			case CHG_U3_HLR -> {
+				int N3 = Bits.extract(opCode.encoding, 3, 3);
+				boolean newV = Bits.test(opCode.encoding, 6);
+				write8AtHl(Bits.set(read8AtHl(), N3, newV));
+			}
+
+
+			// Misc. ALU
+			case DAA -> {
+				int vf = Alu.bcdAdjust(regFile.get(Reg.A), Bits.test(regFile.get(Reg.F), 6),
+						Bits.test(regFile.get(Reg.F), 5), Bits.test(regFile.get(Reg.F), 4));
+				setRegFromAlu(Reg.A, vf);
+				combineAluFlags(vf, FlagSrc.ALU, FlagSrc.CPU, FlagSrc.V0, FlagSrc.ALU);
+			}
+			case SCCF -> {
+				boolean C = Bits.test(regFile.get(Reg.F), 4);
+				boolean newC = !Bits.test(opCode.encoding, 3) || !C;
+				int vf = Alu.packValueZNHC(0, false, false, false, newC);
+				combineAluFlags(vf, FlagSrc.CPU, FlagSrc.V0, FlagSrc.V0, FlagSrc.ALU);
+			}
+
+
+			// Jumps
+			case JP_HL -> {
+				nextPC = reg16(Reg16.HL);
+			}
+			case JP_N16 -> {
+				nextPC = read16AfterOpcode();
+			}
+			case JP_CC_N16 -> {
+				int N16 = read16AfterOpcode();
+				boolean cc = extractCondition(opCode);
+				if (cc) {
+					nextPC = N16;
+					nextNonIdleCycle += opCode.additionalCycles;
+				}
+			}
+			case JR_E8 -> {
+				int E8 = Bits.signExtend8(read8AfterOpcode());
+				nextPC = Bits.clip(16, E8 + nextPC);
+			}
+			case JR_CC_E8 -> {
+				int E8 = Bits.signExtend8(read8AfterOpcode());
+				boolean cc = extractCondition(opCode);
+				if (cc) {
+					nextPC = Bits.clip(16, nextPC + E8);
+					nextNonIdleCycle += opCode.additionalCycles;
+				}
+			}
+
+
+			// Calls and returns
+			case CALL_N16 -> {
+				int N16 = read16AfterOpcode();
 				push16(nextPC);
 				nextPC = N16;
-				nextNonIdleCycle += opCode.additionalCycles;
 			}
-		}
-			break;
-		case RST_U3: {
-			push16(nextPC);
-			nextPC = AddressMap.RESETS[Bits.extract(opCode.encoding, 3, 3)];
-		}
-			break;
-		case RET: {
-			nextPC = pop16();
-		}
-			break;
-		case RET_CC: {
-			boolean cc = extractCondition(opCode);
-			if (cc) {
+			case CALL_CC_N16 -> {
+				int N16 = read16AfterOpcode();
+				boolean cc = extractCondition(opCode);
+				if (cc) {
+					push16(nextPC);
+					nextPC = N16;
+					nextNonIdleCycle += opCode.additionalCycles;
+				}
+			}
+			case RST_U3 -> {
+				push16(nextPC);
+				nextPC = AddressMap.RESETS[Bits.extract(opCode.encoding, 3, 3)];
+			}
+			case RET -> {
 				nextPC = pop16();
-				nextNonIdleCycle += opCode.additionalCycles;
 			}
-		}
-			break;
+			case RET_CC -> {
+				boolean cc = extractCondition(opCode);
+				if (cc) {
+					nextPC = pop16();
+					nextNonIdleCycle += opCode.additionalCycles;
+				}
+			}
 
-		// Interrupts
-		case EDI: {
-			IME = Bits.test(opCode.encoding, 3);
-		}
-			break;
-		case RETI: {
-			IME = true;
-			nextPC = pop16();
-		}
-			break;
 
-		// Misc control
-		case HALT: {
-			nextNonIdleCycle = Long.MAX_VALUE;
-		}
-			break;
-		case STOP:
-			throw new Error("STOP is not implemented");
-		default: {
-		}
-			break;
+			// Interrupts
+			case EDI -> {
+				IME = Bits.test(opCode.encoding, 3);
+			}
+			case RETI -> {
+				IME = true;
+				nextPC = pop16();
+			}
+
+
+			// Misc control
+			case HALT -> {
+				nextNonIdleCycle = Long.MAX_VALUE;
+			}
+			case STOP -> throw new Error("STOP is not implemented");
+			default -> {
+			}
 		}
 
 		nextNonIdleCycle += opCode.cycles;
@@ -722,18 +650,13 @@ public final class Cpu implements Component, Clocked {
 	// Register pairs management method
 
 	private int reg16(Reg16 r) {
-		switch (r) {
-		case AF:
-			return Bits.make16(regFile.get(Reg.A), regFile.get(Reg.F));
-		case BC:
-			return Bits.make16(regFile.get(Reg.B), regFile.get(Reg.C));
-		case DE:
-			return Bits.make16(regFile.get(Reg.D), regFile.get(Reg.E));
-		case HL:
-			return Bits.make16(regFile.get(Reg.H), regFile.get(Reg.L));
-		default:
-			throw new IllegalArgumentException();
-		}
+		return switch (r) {
+			case AF -> Bits.make16(regFile.get(Reg.A), regFile.get(Reg.F));
+			case BC -> Bits.make16(regFile.get(Reg.B), regFile.get(Reg.C));
+			case DE -> Bits.make16(regFile.get(Reg.D), regFile.get(Reg.E));
+			case HL -> Bits.make16(regFile.get(Reg.H), regFile.get(Reg.L));
+			default -> throw new IllegalArgumentException();
+		};
 	}
 
 	private void setReg16(Reg16 r, int newV) {
@@ -742,25 +665,24 @@ public final class Cpu implements Component, Clocked {
 		int highB = Bits.extract(newV, 8, 8);
 
 		switch (r) {
-		case AF:
-			lowB &= (((1 << 4) - 1) << 4);
-			regFile.set(Reg.A, highB);
-			regFile.set(Reg.F, lowB);
-			break;
-		case BC:
-			regFile.set(Reg.B, highB);
-			regFile.set(Reg.C, lowB);
-			break;
-		case DE:
-			regFile.set(Reg.D, highB);
-			regFile.set(Reg.E, lowB);
-			break;
-		case HL:
-			regFile.set(Reg.H, highB);
-			regFile.set(Reg.L, lowB);
-			break;
-		default:
-			throw new IllegalArgumentException();
+			case AF -> {
+				lowB &= (((1 << 4) - 1) << 4);
+				regFile.set(Reg.A, highB);
+				regFile.set(Reg.F, lowB);
+			}
+			case BC -> {
+				regFile.set(Reg.B, highB);
+				regFile.set(Reg.C, lowB);
+			}
+			case DE -> {
+				regFile.set(Reg.D, highB);
+				regFile.set(Reg.E, lowB);
+			}
+			case HL -> {
+				regFile.set(Reg.H, highB);
+				regFile.set(Reg.L, lowB);
+			}
+			default -> throw new IllegalArgumentException();
 		}
 	}
 
@@ -845,18 +767,13 @@ public final class Cpu implements Component, Clocked {
 
 	private boolean extractCondition(Opcode opCode) {
 		int cc = Bits.extract(opCode.encoding, 3, 2);
-		switch (cc) {
-		case 0:
-			return !Bits.test(regFile.get(Reg.F), 7);
-		case 1:
-			return Bits.test(regFile.get(Reg.F), 7);
-		case 2:
-			return !Bits.test(regFile.get(Reg.F), 4);
-		case 3:
-			return Bits.test(regFile.get(Reg.F), 4);
-		default:
-			throw new IllegalArgumentException();
-		}
+		return switch (cc) {
+			case 0 -> !Bits.test(regFile.get(Reg.F), 7);
+			case 1 -> Bits.test(regFile.get(Reg.F), 7);
+			case 2 -> !Bits.test(regFile.get(Reg.F), 4);
+			case 3 -> Bits.test(regFile.get(Reg.F), 4);
+			default -> throw new IllegalArgumentException();
+		};
 	}
 
 	private static Opcode[] buildOpcodeTable(Opcode.Kind kind) {
