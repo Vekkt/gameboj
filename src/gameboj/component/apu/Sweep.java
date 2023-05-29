@@ -29,7 +29,7 @@ public final class Sweep extends Square {
             super.write(address, data);
             switch (reg) {
                 case NR0 -> {
-                    sweepPeriod = extract(data, 5, 3);
+                    sweepPeriod = extract(data, 4, 3);
                     negate = test(data, 3);
                     shift = clip(3, data);
                     if (isIncrementing && !negate) overflow = true;
