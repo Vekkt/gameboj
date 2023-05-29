@@ -11,9 +11,9 @@ import gameboj.component.Component;
  */
 public final class RamController implements Component {
 
-	private Ram ram;
-	private int startAddress;
-	private int endAddress;
+	private final Ram ram;
+	private final int startAddress;
+	private final int endAddress;
 
 	/**
 	 * Constructor of RamController

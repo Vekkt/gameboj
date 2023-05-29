@@ -3,7 +3,6 @@ package gameboj;
 import gameboj.bits.Bit;
 import gameboj.bits.Bits;
 
-import java.util.Arrays;
 
 /**
  * Represents a register file

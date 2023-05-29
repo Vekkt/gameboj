@@ -75,9 +75,8 @@ public final class BitVector {
 
 	@Override
 	public boolean equals(Object o) {
-		if (!(o instanceof BitVector))
+		if (!(o instanceof BitVector that))
 			return false;
-		BitVector that = (BitVector) o;
 		return (this.size() == that.size() && Arrays.equals(this.vector, that.vector));
 	}
 

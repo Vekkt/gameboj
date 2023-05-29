@@ -12,8 +12,8 @@ public class LengthCounter {
     private int counter;
     private boolean enabled;
 
-    public LengthCounter(int fulLength) {
-        this.fullLength = fulLength;
+    public LengthCounter(int fullLength) {
+        this.fullLength = fullLength;
     }
 
     public void start() { counter = DIVIDER / 2; }

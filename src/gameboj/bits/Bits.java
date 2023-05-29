@@ -2,7 +2,6 @@ package gameboj.bits;
 
 import gameboj.Preconditions;
 
-import java.util.Objects;
 
 /**
  * Methods for bits manipulation.
@@ -190,6 +189,6 @@ public final class Bits {
 	public static int make16(int highB, int lowB) {
 		Preconditions.checkBits8(highB);
 		Preconditions.checkBits8(lowB);
-		return (clip(8, highB) << 8) + clip(8, lowB);
+		return (clip(8, highB) << 8) | clip(8, lowB);
 	}
 }

@@ -184,9 +184,8 @@ public final class LcdImageLine {
 
 	@Override
 	public boolean equals(Object that) {
-		if (!(that instanceof LcdImageLine))
+		if (!(that instanceof LcdImageLine line))
 			return false;
-		LcdImageLine line = (LcdImageLine) that;
 		return msb.equals(line.msb) && lsb.equals(line.lsb) && opa.equals(line.opa);
 	}
 

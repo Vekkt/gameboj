@@ -12,7 +12,7 @@ import gameboj.component.cartridge.Cartridge;
  */
 public final class BootRomController implements Component {
 
-	private Cartridge cartridge;
+	private final Cartridge cartridge;
 	private boolean activated;
 
 	/**

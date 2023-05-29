@@ -69,9 +69,8 @@ public final class LcdImage {
 
 	@Override
 	public boolean equals(Object that) {
-		if (!(that instanceof LcdImage))
+		if (!(that instanceof LcdImage image))
 			return false;
-		LcdImage image = (LcdImage) that;
 		return lines.equals(image.lines);
 	}
 
