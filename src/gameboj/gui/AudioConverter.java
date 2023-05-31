@@ -12,7 +12,7 @@ import static gameboj.GameBoy.CLOCK_FREQ;
 
 public final class AudioConverter implements SoundOutput {
     private static final int SAMPLE_RATE = 22050;
-    private static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 4096;
 
     private static final AudioFormat FORMAT = new AudioFormat(
             AudioFormat.Encoding.PCM_UNSIGNED,
@@ -64,11 +64,6 @@ public final class AudioConverter implements SoundOutput {
             tick %= divider;
             return;
         }
-
-        Preconditions.checkArgument(left >= 0);
-        Preconditions.checkArgument(left < 256);
-        Preconditions.checkArgument(right >= 0);
-        Preconditions.checkArgument(right < 256);
 
         buffer[i++] = (byte) (left);
         buffer[i++] = (byte) (right);
