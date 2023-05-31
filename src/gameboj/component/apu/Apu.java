@@ -67,7 +67,8 @@ public final class Apu implements Component, Clocked {
         left *= extract(volumes, 4, 3);
         right *= clip(3, volumes);
 
-//        output.play((byte) left, (byte) right);
+        if (output != null)
+            output.play((byte) left, (byte) right);
     }
 
     @Override public int read(int address) {
@@ -133,7 +134,8 @@ public final class Apu implements Component, Clocked {
     }
 
     private void stop() {
-        output.stop();
+        if (output != null)
+            output.stop();
         for (SoundChannel c : channels)
             c.stop();
     }
@@ -150,6 +152,8 @@ public final class Apu implements Component, Clocked {
 
         for (SoundChannel c : channels)
             c.start();
-        output.start();
+
+        if (output != null)
+            output.start();
     }
 }
