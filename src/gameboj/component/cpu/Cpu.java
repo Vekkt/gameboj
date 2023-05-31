@@ -127,8 +127,7 @@ public final class Cpu implements Component, Clocked {
 		int nextPC = PC + opCode.totalBytes;
 
 		switch (opCode.family) {
-			case NOP -> {
-			}
+			case NOP -> {}
 
 			// Load
 			case LD_R8_HLR -> {

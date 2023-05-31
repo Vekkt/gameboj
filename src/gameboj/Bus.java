@@ -38,8 +38,9 @@ public final class Bus {
 		Preconditions.checkBits16(address);
 
 		for (Component c : comp) {
-			if (c.read(address) != Component.NO_DATA)
-				return c.read(address);
+			int result = c.read(address);
+			if (result != Component.NO_DATA)
+				return result;
 		}
 		return 0xFF;
 	}

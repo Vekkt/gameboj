@@ -80,5 +80,4 @@ public final class Ram {
 		Preconditions.checkArgument(data.length == this.data.length);
 		this.data = data;
 	}
-
 }
