@@ -4,11 +4,9 @@ import gameboj.component.memory.Ram;
 import gameboj.component.apu.Apu.ChannelType;
 
 import static gameboj.AddressMap.*;
-import static gameboj.bits.Bits.extract;
-import static gameboj.bits.Bits.test;
+import static gameboj.bits.Bits.*;
 
 public final class Wave extends SoundChannel {
-
     private final Ram waveRAM;
 
     private boolean triggered;
@@ -62,7 +60,7 @@ public final class Wave extends SoundChannel {
                             if (pos < 4) {
                                 waveRAM.write(0, waveRAM.read(pos));
                             } else {
-                                pos &= 0b100;
+                                pos &= 0b1100;
                                 for (int j = 0; j < 4; j++) {
                                     waveRAM.write(j, waveRAM.read(((pos + j) % 0x10)));
                                 }
@@ -114,7 +112,7 @@ public final class Wave extends SoundChannel {
         buffer = waveRAM.read(lastReadAddr - REG_WAVE_TAB_START);
         int b = buffer;
         if (wavePosition % 2 == 0) b = extract(b, 4, 4);
-        else b = clip(b, 4);
+        else b = clip(4, b);
 
         return switch (volume()) {
             case 0 -> 0;
@@ -127,5 +125,10 @@ public final class Wave extends SoundChannel {
 
     private int volume() {
         return extract(regFile.get(Reg.NR2), 5, 2);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Wave[buffer=%d,output=%d,pos=%d,freq=%s]", buffer, output, wavePosition, freqDiv);
     }
 }
