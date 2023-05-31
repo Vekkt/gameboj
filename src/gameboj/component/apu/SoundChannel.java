@@ -39,18 +39,11 @@ public abstract class SoundChannel implements Component {
         else length = new LengthCounter(64);
     }
 
-
-    // Start Abstract Methods
-    /**************************************************************************/
-
     public abstract int clock();
 
     protected abstract void trigger();
 
     protected abstract void start();
-
-    // End Abstract Methods
-    /**************************************************************************/
 
     @Override public int read(int address) {
         if (regStartAddress <= address && address < regEndAddress) {
