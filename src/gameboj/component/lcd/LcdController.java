@@ -39,6 +39,9 @@ public final class LcdController implements Component, Clocked {
 
 	private final static int LINE_CYCLES = 114;
 	private final static int VBLANK_CYCLES = 154;
+	public static final int MODE2_CYCLES = 20;
+	public static final int MODE3_CYCLES = 43;
+	public static final int MODE0_CYCLES = 51;
 
 	private final RamController VRAMController = new RamController(
 			new Ram(AddressMap.VIDEO_RAM_SIZE),
@@ -173,7 +176,7 @@ public final class LcdController implements Component, Clocked {
 
 			changeModeSTAT(2);
 			tryLcdStatInterrupt(2);
-			nextNonIdleCycle += 20;
+			nextNonIdleCycle += MODE2_CYCLES;
 
 		} else if (checkModeSTAT(2)) {
 			changeModeSTAT(3);
@@ -183,12 +186,12 @@ public final class LcdController implements Component, Clocked {
 			LcdImageLine currentLine = computeLine(regFile.get(Reg.LY));
 
 			lcdImageBuilder.setLine(regFile.get(Reg.LY), currentLine);
-			nextNonIdleCycle += 43;
+			nextNonIdleCycle += MODE3_CYCLES;
 
 		} else if (checkModeSTAT(3)) {
 			changeModeSTAT(0);
 			tryLcdStatInterrupt(0);
-			nextNonIdleCycle += 51;
+			nextNonIdleCycle += MODE0_CYCLES;
 		}
 	}
 
@@ -250,11 +253,11 @@ public final class LcdController implements Component, Clocked {
 
 	private LcdImageLine[] getSpriteLines(int row) {
 		int[] sprites = spritesIntersectingLine(row);
-		LcdImageLine spriteBGLine = new LcdImageLine.Builder(160).build();
-		LcdImageLine spriteFGLine = new LcdImageLine.Builder(160).build();
+		LcdImageLine spriteBGLine = new LcdImageLine.Builder(LCD_WIDTH).build();
+		LcdImageLine spriteFGLine = new LcdImageLine.Builder(LCD_WIDTH).build();
 
 		for (int number : sprites) {
-			LcdImageLine.Builder singleSpriteLineBuilder = new LcdImageLine.Builder(160);
+			LcdImageLine.Builder singleSpriteLineBuilder = new LcdImageLine.Builder(LCD_WIDTH);
 			int spriteYLoc = OAMController.read(AddressMap.OAM_START + number * 4) - 16;
 			int spriteXLoc = OAMController.read(AddressMap.OAM_START + number * 4 + 1) - 8;
 			int spriteIndex = OAMController.read(AddressMap.OAM_START + number * 4 + 2);
