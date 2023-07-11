@@ -29,7 +29,7 @@ public final class MBC1 implements Component {
 	private final String saveName;
 
 	public MBC1(Rom rom, int ramSize) {
-		this(rom, ramSize, null);
+		this(rom, ramSize, "");
 	}
 
 	public MBC1(Rom rom, int ramSize, String romName) {
@@ -44,10 +44,10 @@ public final class MBC1 implements Component {
 		this.romMask = rom.size() - 1;
 		this.ramMask = ramSize - 1;
 
-		String romName1 = romName.substring(0, romName.length() - 3);
+		String romName1 = (romName.length() > 3) ? romName.substring(0, romName.length() - 3) : "save";
 		this.saveName = "saves\\" + romName1 + ".sav";
 
-		try (InputStream i = new FileInputStream(saveName)) {
+		try {
 			byte[] saveData = Files.readAllBytes((new File(saveName)).toPath());
 			ram.loadRam(saveData);
 		} catch (FileNotFoundException e) {
