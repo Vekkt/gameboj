@@ -76,34 +76,10 @@ public final class GameBoy {
 	}
 
 	/**
-	 * Returns the CPU attached to the bus of the GB
-	 * @return cpu : the cpu of the GB
-	 */
-	public Cpu cpu() {
-		return cpu;
-	}
-
-	/**
-	 * Returns the bus of the GB
-	 * @return bus : the bus of the GB
-	 */
-	public Bus bus() {
-		return bus;
-	}
-
-	/**
 	 * Returns the current clock tick
 	 * @return tick : the current tick
 	 */
 	public long ticks() { return tick; }
-
-	/**
-	 * Returns the timer attached to the bus of the GB
-	 * @return timer : the timer of the GB
-	 */
-	public Timer timer() {
-		return timer;
-	}
 
 	/**
 	 * Returns the LCD controller attached to the bus of the GB
