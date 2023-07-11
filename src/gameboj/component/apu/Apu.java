@@ -22,11 +22,9 @@ public final class Apu implements Component, Clocked {
     };
 
     private final RegisterFile<Reg> regFile = new RegisterFile<>(Reg.values());
-
     private final SoundChannel[] channels;
     private final SoundOutput output;
     private final int[] amplitudes;
-
     private boolean enabled;
 
     public Apu(SoundOutput output) {
@@ -51,7 +49,6 @@ public final class Apu implements Component, Clocked {
         for (int i = 0; i < channels.length; ++i)
             amplitudes[i] = channels[i].clock();
 
-        /* Needs to be optimized */
         int outputSelect = regFile.get(Reg.NR51);
         int left = 0;
         int right = 0;

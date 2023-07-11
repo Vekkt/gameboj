@@ -59,11 +59,8 @@ public final class RamController implements Component {
 
 	@Override
 	public void write(int address, int data) {
-		Preconditions.checkBits8(data);
-		Preconditions.checkBits16(address);
-
 		if (startAddress <= address && address <= endAddress) {
-			ram.write(address - startAddress, data);
+			ram.write(Preconditions.checkBits16(address) - startAddress, Preconditions.checkBits8(data));
 		}
 	}
 

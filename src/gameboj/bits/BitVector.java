@@ -250,6 +250,7 @@ public final class BitVector {
 				throw new IllegalStateException();
 			if (index < 0 || vector.length * 4 <= index)
 				throw new IndexOutOfBoundsException();
+
 			Preconditions.checkBits8(val);
 
 			for (int i = 0; i < Byte.SIZE; i++) {

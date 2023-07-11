@@ -55,11 +55,10 @@ public final class Ram {
 	 * @param value : 8 bits value to write at the index
 	 */
 	public void write(int index, int value) {
-		Preconditions.checkBits8(value);
 		if (index < 0 || index >= size()) {
 			throw new IndexOutOfBoundsException();
 		} else {
-			data[index] = (byte) value;
+			data[index] = (byte) Preconditions.checkBits8(value);
 		}
 	}
 

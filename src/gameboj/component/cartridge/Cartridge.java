@@ -1,6 +1,5 @@
 package gameboj.component.cartridge;
 
-import gameboj.Preconditions;
 import gameboj.component.Component;
 import gameboj.component.memory.Rom;
 
@@ -9,6 +8,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+
+import static gameboj.Preconditions.checkBits16;
+import static gameboj.Preconditions.checkBits8;
 
 /**
  * Represents a cartridge of type 0
@@ -35,7 +37,6 @@ public final class Cartridge implements Component {
 	 * @throws IllegalArgumentException if the ROM is not of type 0
 	 */
 	public static Cartridge ofFile(File romFile) throws IOException {
-
         try (InputStream stream = new FileInputStream(romFile)) {
             cartridgeName = romFile.getName();
             byte[] data = Files.readAllBytes(romFile.toPath());
@@ -49,15 +50,13 @@ public final class Cartridge implements Component {
 
 	@Override
 	public int read(int address) {
-		Preconditions.checkBits16(address);
+		checkBits16(address);
 		return mbc.read(address);
 	}
 
 	@Override
 	public void write(int address, int data) {
-		Preconditions.checkBits16(address);
-		Preconditions.checkBits8(data);
-		mbc.write(address, data);
+		mbc.write(checkBits16(address), checkBits8(data));
 	}
 	public void saveGame() {
 		mbc.save();

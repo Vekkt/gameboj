@@ -47,10 +47,8 @@ public class Joypad implements Component {
 
 	@Override
 	public void write(int address, int data) {
-		Preconditions.checkBits16(address);
-		Preconditions.checkBits8(data);
-		if (address == AddressMap.REG_P1) {
-			P1 = 0xC0 + (Bits.extract(data, 4, 2) << 4);
+		if (Preconditions.checkBits16(address) == AddressMap.REG_P1) {
+			P1 = 0xC0 + (Bits.extract(Preconditions.checkBits8(data), 4, 2) << 4);
 			if (!Bits.test(P1, 4))
 				P1 = P1 | Bits.clip(4, keysLine1);
 			if (!Bits.test(P1, 5))

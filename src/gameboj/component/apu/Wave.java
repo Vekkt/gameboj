@@ -52,7 +52,7 @@ public final class Wave extends SoundChannel {
                     dacEnabled = test(data, 7);
                     channelEnabled &= dacEnabled;
                 }
-                case NR1 -> length.setLength(256 - data);
+                case NR1 -> length.setLength(length.fullLength - data);
                 case NR4 -> { // obscure behavior
                     if (test(data, 7)) {
                         if (isEnabled() && freqDiv == 2) {
@@ -125,10 +125,5 @@ public final class Wave extends SoundChannel {
 
     private int volume() {
         return extract(regFile.get(Reg.NR2), 5, 2);
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Wave[buffer=%d,output=%d,pos=%d,freq=%s]", buffer, output, wavePosition, freqDiv);
     }
 }

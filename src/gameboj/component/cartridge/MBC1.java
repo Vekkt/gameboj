@@ -25,7 +25,7 @@ public final class MBC1 implements Component {
 	private Mode mode;
 	private int romLsb5, ramRom2;
 	private final int romMask, ramMask;
-	private final String romName;
+
 	private final String saveName;
 
 	public MBC1(Rom rom, int ramSize) {
@@ -44,8 +44,8 @@ public final class MBC1 implements Component {
 		this.romMask = rom.size() - 1;
 		this.ramMask = ramSize - 1;
 
-		this.romName = romName.substring(0, romName.length() - 3);
-		this.saveName = "saves\\" + this.romName + ".sav";
+		String romName1 = romName.substring(0, romName.length() - 3);
+		this.saveName = "saves\\" + romName1 + ".sav";
 
 		try (InputStream i = new FileInputStream(saveName)) {
 			byte[] saveData = Files.readAllBytes((new File(saveName)).toPath());
@@ -87,8 +87,7 @@ public final class MBC1 implements Component {
         return switch (mode) {
             case MODE_0 -> 0;
             case MODE_1 -> ramRom2;
-            default -> throw new Error();
-        };
+		};
 	}
 
 	private int romAddress(int b_20_19, int b_18_14, int b_13_0) {

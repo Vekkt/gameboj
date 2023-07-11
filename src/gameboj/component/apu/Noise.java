@@ -39,7 +39,7 @@ public final class Noise extends SoundChannel {
             super.write(address, data);
             switch (reg) {
                 case NR1:
-                    length.setLength(64 - clip(6, data));
+                    length.setLength(length.fullLength - clip(6, data));
                     break;
                 case NR2:
                     envelope.updateEnvelope(data);

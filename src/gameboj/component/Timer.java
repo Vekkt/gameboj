@@ -1,13 +1,14 @@
 package gameboj.component;
 
 import gameboj.AddressMap;
-import gameboj.Preconditions;
 import gameboj.bits.Bits;
 import gameboj.component.cpu.Cpu;
 import gameboj.component.cpu.Cpu.Interrupt;
 
 import java.util.Objects;
 
+import static gameboj.Preconditions.checkBits16;
+import static gameboj.Preconditions.checkBits8;
 import static gameboj.bits.Bits.clip;
 import static gameboj.bits.Bits.test;
 
@@ -57,7 +58,7 @@ public final class Timer implements Component, Clocked {
 	 */
 	@Override
 	public int read(int address) {
-		Preconditions.checkBits16(address);
+		checkBits16(address);
         return switch (address) {
             case AddressMap.REG_DIV -> Bits.extract(DIV, 8, 8);
             case AddressMap.REG_TIMA -> TIMA;
@@ -77,13 +78,11 @@ public final class Timer implements Component, Clocked {
 	 */
 	@Override
 	public void write(int address, int data) {
-		Preconditions.checkBits16(address);
-		Preconditions.checkBits8(data);
-        switch (address) {
+        switch (checkBits16(address)) {
             case AddressMap.REG_DIV -> update(regName.DIV, 0);
-            case AddressMap.REG_TIMA -> TIMA = data;
-            case AddressMap.REG_TMA -> TMA = data;
-            case AddressMap.REG_TAC -> update(regName.TAC, data);
+            case AddressMap.REG_TIMA -> TIMA = checkBits8(data);
+            case AddressMap.REG_TMA -> TMA = checkBits8(data);
+            case AddressMap.REG_TAC -> update(regName.TAC, checkBits8(data));
         }
 	}
 

@@ -39,8 +39,7 @@ public final class RegisterFile<E extends Register> {
 	 * @throws IllegalArgumentException if <code>newValue</code> is not 8-bit value
 	 */
 	public void set(E reg, int newValue) {
-		Preconditions.checkBits8(newValue);
-		file[reg.index()] = (byte) newValue;
+		file[reg.index()] = (byte) Preconditions.checkBits8(newValue);
 	}
 
 	/**

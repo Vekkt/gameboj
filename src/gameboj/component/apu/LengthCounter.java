@@ -7,7 +7,7 @@ import static gameboj.bits.Bits.test;
 public class LengthCounter {
     private final static int DIVIDER = (int) CLOCK_FREQ / 256;
 
-    private final int fullLength;
+    protected final int fullLength;
     private int length;
     private int counter;
     private boolean enabled;
@@ -31,13 +31,11 @@ public class LengthCounter {
         boolean enable = test(data, 6);
         boolean trigger = test(data, 7);
 
-        if (enabled) {
-            if (length == 0 && trigger) {
-                if (enable && counter < DIVIDER / 2) {
-                    setLength(fullLength - 1);
-                } else {
-                    setLength(fullLength);
-                }
+        if (enabled && (length == 0 && trigger)) {
+            if (enable && counter < DIVIDER / 2) {
+                setLength(fullLength - 1);
+            } else {
+                setLength(fullLength);
             }
         } else if (enable) {
             if (length > 0 && counter < DIVIDER / 2) {
@@ -46,10 +44,8 @@ public class LengthCounter {
             if (length == 0 && trigger && counter < DIVIDER / 2) {
                 setLength(fullLength - 1);
             }
-        } else {
-            if (length == 0 && trigger) {
-                setLength(fullLength);
-            }
+        } else if (length == 0 && trigger) {
+            setLength(fullLength);
         }
         enabled = enable;
     }

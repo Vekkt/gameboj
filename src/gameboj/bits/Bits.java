@@ -148,8 +148,7 @@ public final class Bits {
 	 * @throws IllegalArgumentException if b is not an 8 bit value
 	 */
 	public static int signExtend8(int b) {
-		Preconditions.checkBits8(b);
-		return (byte) b;
+		return (byte) Preconditions.checkBits8(b);
 	}
 
 	/**
@@ -160,8 +159,7 @@ public final class Bits {
 	 * @throws IllegalArgumentException if b is not a 8 bit value
 	 */
 	public static int reverse8(int b) {
-		Preconditions.checkBits8(b);
-		return LOOKUP[b];
+		return LOOKUP[Preconditions.checkBits8(b)];
 	}
 
 	/**
@@ -172,8 +170,7 @@ public final class Bits {
 	 * @throws IllegalArgumentException if b is not an 8 bit value
 	 */
 	public static int complement8(int b) {
-		Preconditions.checkBits8(b);
-		return 0xFF ^ b;
+		return 0xFF ^ Preconditions.checkBits8(b);
 	}
 
 	/**
@@ -187,8 +184,6 @@ public final class Bits {
 	 * @throws IllegalArgumentException if one of the parameters is not an 8 bit value
 	 */
 	public static int make16(int highB, int lowB) {
-		Preconditions.checkBits8(highB);
-		Preconditions.checkBits8(lowB);
-		return (clip(8, highB) << 8) | clip(8, lowB);
+		return (clip(8,Preconditions.checkBits8(highB)) << 8) | clip(8, Preconditions.checkBits8(lowB));
 	}
 }
