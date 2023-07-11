@@ -38,16 +38,6 @@ public final class RamController implements Component {
 		this.endAddress = endAddress - 1;
 	}
 
-	/**
-	 * Constructor of RamController such as all ram accessible
-	 * 
-	 * @param ram : RAM to control
-	 * @param startAddress : starting address of the RAM, 16 bits value
-	 */
-	public RamController(Ram ram, int startAddress) {
-		this(ram, startAddress, startAddress + ram.size());
-	}
-
 	@Override
 	public int read(int address) {
 		Preconditions.checkArgument(0 <= address && address <= 0xFFFF);
