@@ -7,6 +7,7 @@ import gameboj.component.memory.Rom;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 import static gameboj.Preconditions.checkBits16;
 import static gameboj.Preconditions.checkBits8;
@@ -50,7 +51,7 @@ public final class MBC1 implements Component {
 		try {
 			byte[] saveData = Files.readAllBytes((new File(saveName)).toPath());
 			ram.loadRam(saveData);
-		} catch (FileNotFoundException e) {
+		} catch (NoSuchFileException e) {
 			// do nothing
 		} catch (IOException e) {
 			e.printStackTrace();
