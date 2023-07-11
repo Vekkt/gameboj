@@ -4,9 +4,7 @@ import gameboj.component.Component;
 import gameboj.component.memory.Rom;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 
 import static gameboj.Preconditions.checkBits16;
@@ -20,7 +18,6 @@ import static gameboj.Preconditions.checkBits8;
  */
 public final class Cartridge implements Component {
 
-	private static String cartridgeName;
 	private final MBC1 mbc;
 	private final static int[] RAM_SIZE = { 0, 2048, 8192, 32768 };
 
@@ -37,7 +34,7 @@ public final class Cartridge implements Component {
 	 * @throws IllegalArgumentException if the ROM is not of type 0
 	 */
 	public static Cartridge ofFile(File romFile) throws IOException {
-		cartridgeName = romFile.getName();
+		String cartridgeName = romFile.getName();
 		byte[] data = Files.readAllBytes(romFile.toPath());
 		return new Cartridge(new MBC1(new Rom(data), RAM_SIZE[data[0x149]], cartridgeName));
 	}
