@@ -51,8 +51,8 @@ public final class GameBoy {
 		lcd = new LcdController(cpu);
 
 		Ram workRam = new Ram(AddressMap.WORK_RAM_SIZE);
-		bus.attach(new RamController(workRam, AddressMap.WORK_RAM_START, AddressMap.WORK_RAM_END));
-		bus.attach(new RamController(workRam, AddressMap.ECHO_RAM_START, AddressMap.ECHO_RAM_END));
+		bus.attach(new RamController(workRam, AddressMap.WORK_RAM_START));
+		bus.attach(new RamController(workRam, AddressMap.ECHO_RAM_START));
 
 		bus.attach(new BootRomController(rom));
 		bus.attach(timer);
