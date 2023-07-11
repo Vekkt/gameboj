@@ -29,10 +29,6 @@ public final class MBC1 implements Component {
 
 	private final String saveName;
 
-	public MBC1(Rom rom, int ramSize) {
-		this(rom, ramSize, "");
-	}
-
 	public MBC1(Rom rom, int ramSize, String romName) {
 		this.rom = rom;
 		this.ram = new Ram(ramSize);
