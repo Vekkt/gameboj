@@ -65,11 +65,11 @@ public final class Ram {
 	public void saveRam(File file) {
 		OutputStream out;
 		try {
-			file.getParentFile().mkdirs();
-			file.createNewFile();
-			out = new FileOutputStream(file);
-			out.write(data);
-			out.close();
+			if (file.getParentFile().mkdirs() && file.createNewFile()){
+				out = new FileOutputStream(file);
+				out.write(data);
+				out.close();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
