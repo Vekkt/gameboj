@@ -16,6 +16,9 @@ public abstract class SoundChannel implements Component {
             {0xFF, 0xFF, 0x00, 0x00, 0xBF},
     };
 
+    private final static int WAVE_FULL_LENGTH = 256;
+    private final static int DEFAULT_FULL_LENGTH = 64;
+
     protected enum Reg implements Register {
         NR0, NR1, NR2, NR3, NR4
     }
@@ -35,8 +38,8 @@ public abstract class SoundChannel implements Component {
         regEndAddress = REGS_CH_END[type.ordinal()];
         channelMasks = CHANNEL_MASKS[type.ordinal()];
 
-        if (type == ChannelType.WAVE) length = new LengthCounter(256);
-        else length = new LengthCounter(64);
+        if (type == ChannelType.WAVE) length = new LengthCounter(WAVE_FULL_LENGTH);
+        else length = new LengthCounter(DEFAULT_FULL_LENGTH);
     }
 
     public abstract int clock();

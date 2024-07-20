@@ -1,6 +1,7 @@
 package gameboj.component.apu;
 
 import static gameboj.GameBoy.CLOCK_FREQ;
+import static gameboj.bits.Bits.clip;
 import static gameboj.bits.Bits.test;
 
 public final class VolumeEnvelope {
@@ -24,7 +25,7 @@ public final class VolumeEnvelope {
     void updateEnvelope(int data) {
         this.initialVolume = data >> 4;
         this.envelopeDirection = test(data, 3) ? Direction.INCR : Direction.DECR;
-        this.period = data & 0x07;
+        this.period = clip(3, data);
     }
 
     public void start() {

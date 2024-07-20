@@ -10,9 +10,8 @@ import javax.sound.sampled.SourceDataLine;
 import static gameboj.GameBoy.CLOCK_FREQ;
 
 public final class AudioConverter implements SoundOutput {
-    private static final int SAMPLE_RATE = 22050;
+    private static final int SAMPLE_RATE = 44100;
     private static final int BUFFER_SIZE = 4096;
-
     private static final AudioFormat FORMAT = new AudioFormat(
             AudioFormat.Encoding.PCM_UNSIGNED,
             SAMPLE_RATE,
@@ -22,12 +21,12 @@ public final class AudioConverter implements SoundOutput {
             SAMPLE_RATE,
             false
     );
+    private final static byte[] buffer = new byte[BUFFER_SIZE];
+    private static final int DIVIDER = (int) (CLOCK_FREQ / FORMAT.getSampleRate());
 
     private SourceDataLine line;
-    private byte[] buffer;
     private int i;
     private int tick;
-    private int divider;
 
     @Override
     public void start() {
@@ -42,8 +41,6 @@ public final class AudioConverter implements SoundOutput {
             throw new RuntimeException(e);
         }
         line.start();
-        buffer = new byte[line.getBufferSize()];
-        divider = (int) (CLOCK_FREQ / FORMAT.getSampleRate());
     }
 
     @Override
@@ -60,14 +57,15 @@ public final class AudioConverter implements SoundOutput {
     @Override
     public void play(int left, int right) {
         if (tick++ != 0) {
-            tick %= divider;
+            tick %= DIVIDER;
             return;
         }
 
         buffer[i++] = (byte) (left);
         buffer[i++] = (byte) (right);
-        if (i > BUFFER_SIZE / 2) {
-            line.write(buffer, 0, i);
+
+        if (i == BUFFER_SIZE) {
+            line.write(buffer, 0, BUFFER_SIZE);
             i = 0;
         }
     }
